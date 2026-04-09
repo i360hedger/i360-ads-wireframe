@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>i360 Ads — Unified Ad Operations Platform</title>
+<meta name="description" content="i360 Ads wireframe — campaign taxonomy, IO management, QA, and creative upload workflow.">
+<meta property="og:title" content="i360 Ads — Unified Ad Operations Platform">
+<meta property="og:description" content="Interactive wireframe for i360's unified ad operations dashboard. Campaign creation, IO parsing, taxonomy generation, creative upload, and QA review.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2328ACE2'/><text x='16' y='22' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='16' fill='white'>i3</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root {
+    --i360-blue: #28ACE2;
+    --i360-blue-hover: #1E9AD0;
+    --i360-blue-10: rgba(40,172,226,0.10);
+    --i360-blue-15: rgba(40,172,226,0.15);
+    --i360-dark-blue: #37454E;
+    --i360-mint: #66FFCC;
+    --i360-red: #DC582A;
+    --i360-gold: #F0B323;
+    --i360-medium-gray: #878A90;
+    --i360-gray: #C7C8CA;
+    --i360-light-gray: #F3F3F4;
+    --bg-body: #1C282F;
+    --bg-surface: #253640;
+    --bg-elevated: #37454E;
+    --border: #3E4F5A;
+    --border-subtle: #2F3E47;
+    --text-primary: #F3F3F4;
+    --text-secondary: #C7C8CA;
+    --text-muted: #878A90;
+    --success: #10B981;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg-body); color:var(--text-primary); font-family:'Rubik',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; font-size:14px; }
+  ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--i360-dark-blue); border-radius:3px; }
+  button { font-family:inherit; cursor:pointer; } input,select,textarea { font-family:inherit; }
+
+  .shell { display:flex; height:100vh; }
+  .sidebar { width:230px; background:var(--i360-dark-blue); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+  .main { flex:1; overflow-y:auto; }
+
+  .sidebar-logo { padding:18px 20px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); }
+  .logo-mark { display:flex; align-items:center; gap:2px; }
+  .logo-i { font-size:20px; font-weight:700; color:var(--text-primary); }
+  .logo-360 { font-size:20px; font-weight:700; color:var(--i360-blue); }
+  .logo-ads { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-left:6px; align-self:flex-end; margin-bottom:2px; }
+
+  .sidebar-nav { padding:14px 10px; flex:1; }
+  .nav-section { margin-bottom:22px; }
+  .nav-section-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.2px; padding:0 10px; margin-bottom:6px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:6px; color:var(--text-secondary); font-size:13px; font-weight:500; border:none; background:none; width:100%; text-align:left; transition:all 0.15s; }
+  .nav-item:hover { background:rgba(255,255,255,0.06); color:var(--text-primary); }
+  .nav-item.active { background:var(--i360-blue); color:#fff; }
+  .nav-item .badge { margin-left:auto; background:var(--i360-red); color:#fff; font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; }
+
+  .sidebar-status { padding:16px 18px; border-top:1px solid var(--border); }
+  .status-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .status-row { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--text-secondary); margin-bottom:6px; }
+  .status-row:last-child { margin-bottom:0; }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .dot.on { background:var(--i360-mint); box-shadow:0 0 4px rgba(102,255,204,0.4); }
+  .dot.off { background:var(--i360-red); }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:1px solid var(--border); background:var(--bg-surface); }
+  .topbar-left { display:flex; align-items:center; gap:12px; }
+  .topbar-left h2 { font-size:16px; font-weight:600; }
+  .topbar-left .context { font-size:12px; color:var(--text-muted); }
+  .topbar-right { display:flex; align-items:center; gap:8px; }
+  .btn { padding:7px 14px; border-radius:6px; font-size:13px; font-weight:500; border:none; transition:all 0.15s; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text-secondary); }
+  .btn-ghost:hover { border-color:var(--text-muted); color:var(--text-primary); }
+  .btn-primary { background:var(--i360-blue); color:#fff; font-weight:600; }
+  .btn-primary:hover { background:var(--i360-blue-hover); }
+  .btn-success { background:var(--success); color:#fff; font-weight:600; }
+  .btn-danger { background:var(--i360-red); color:#fff; font-weight:600; }
+
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* ─── Campaigns List ─── */
+  .campaigns-toolbar { display:flex; gap:8px; margin-bottom:16px; align-items:center; }
+  .search-input { padding:7px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body); color:var(--text-primary); font-size:13px; width:280px; }
+  .search-input::placeholder { color:var(--text-muted); }
+  .search-input:focus { outline:none; border-color:var(--i360-blue); box-shadow:0 0 0 2px rgba(40,172,226,0.15); }
+  .filter-pill { padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500; border:1px solid var(--border); background:transparent; color:var(--text-secondary); transition:all 0.12s; }
+  .filter-pill:hover { border-color:var(--text-muted); }
+  .filter-pill.on { background:var(--i360-blue-10); color:var(--i360-blue); border-color:transparent; }
+
+  .campaign-table { width:100%; background:var(--bg-surface); border-radius:10px; border:1px solid var(--border); border-collapse:separate; border-spacing:0; overflow:hidden; }
+  .campaign-table th { padding:10px 16px; text-align:left; font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); }
+  .campaign-table td { padding:12px 16px; border-bottom:1px solid var(--border-subtle); font-size:13px; }
+  .campaign-table tr:last-child td { border-bottom:none; }
+  .campaign-table tbody tr { cursor:pointer; transition:background 0.1s; }
+  .campaign-table tbody tr:hover td { background:rgba(40,172,226,0.04); }
+  .c-name { font-weight:500; }
+  .c-name small { display:block; color:var(--text-muted); font-size:11px; font-weight:400; margin-top:2px; font-family:'SF Mono',Menlo,monospace; }
+  .platform-tag { font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600; }
+  .tag-youtube { background:rgba(255,0,0,0.12); color:#FF4444; }
+  .tag-ctv { background:rgba(102,255,204,0.12); color:var(--i360-mint); }
+  .tag-meta { background:rgba(24,119,242,0.15); color:#1877F2; }
+  .tag-sa { background:rgba(100,200,255,0.12); color:#64C8FF; }
+  .tag-search { background:rgba(52,168,83,0.12); color:#34A853; }
+  .tag-ttd { background:rgba(12,12,39,0.40); color:#9595B2; }
+  .tag-linkedin { background:rgba(10,102,194,0.15); color:#0A66C2; }
+  .tag-x { background:rgba(200,200,200,0.12); color:#BBBBBE; }
+  .tag-programmatic { background:rgba(240,179,35,0.14); color:#D4A017; }
+  .tag-youtubetv { background:rgba(255,0,0,0.08); color:#CC3333; }
+  .platform-tags { display:flex; gap:4px; flex-wrap:wrap; }
+  .filter-select { padding:6px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body); color:var(--text-secondary); font-size:12px; font-family:inherit; appearance:none; cursor:pointer; min-width:120px; }
+  .filter-select:focus { outline:none; border-color:var(--i360-blue); box-shadow:0 0 0 2px rgba(40,172,226,0.15); color:var(--text-primary); }
+  .status-pill { font-size:11px; font-weight:600; padding:3px 10px; border-radius:10px; }
+  .s-live { background:rgba(16,185,129,0.12); color:var(--success); }
+  .s-paused { background:rgba(240,179,35,0.12); color:var(--i360-gold); }
+  .s-draft { background:rgba(135,138,144,0.15); color:var(--text-muted); }
+  .s-scheduled { background:var(--i360-blue-10); color:var(--i360-blue); }
+  .s-ended { background:rgba(220,88,42,0.12); color:var(--i360-red); }
+  .pacing-bar { width:60px; height:4px; background:var(--border); border-radius:2px; display:inline-block; vertical-align:middle; margin-right:6px; overflow:hidden; }
+  .pacing-fill { height:100%; border-radius:2px; }
+
+  /* ─── Campaign Detail / Scoreboard ─── */
+  .detail-back { display:flex; align-items:center; gap:6px; background:none; border:none; color:var(--text-muted); font-size:13px; cursor:pointer; margin-bottom:16px; padding:0; }
+  .detail-back:hover { color:var(--text-primary); }
+  .detail-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
+  .detail-title h2 { font-size:20px; font-weight:700; margin-bottom:4px; }
+  .detail-meta { display:flex; gap:12px; font-size:12px; color:var(--text-muted); }
+  .detail-meta span { display:flex; align-items:center; gap:4px; }
+  .detail-actions { display:flex; gap:8px; }
+
+  .score-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:24px; }
+  .score-card { background:var(--bg-surface); border-radius:10px; border:1px solid var(--border); padding:16px; }
+  .score-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+  .score-val { font-size:22px; font-weight:700; }
+  .score-sub { font-size:11px; margin-top:2px; color:var(--text-muted); }
+  .score-sub.up { color:var(--success); }
+  .score-sub.down { color:var(--i360-red); }
+
+  .line-items-table { width:100%; background:var(--bg-surface); border-radius:10px; border:1px solid var(--border); border-collapse:separate; border-spacing:0; overflow:hidden; margin-bottom:24px; }
+  .line-items-table th { padding:10px 14px; text-align:left; font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); }
+  .line-items-table td { padding:10px 14px; border-bottom:1px solid var(--border-subtle); font-size:13px; }
+  .line-items-table tr:last-child td { border-bottom:none; }
+
+  .section-title { font-size:14px; font-weight:600; margin-bottom:12px; }
+
+  .qa-banner { display:flex; align-items:center; gap:12px; padding:14px 18px; border-radius:10px; margin-bottom:24px; font-size:13px; }
+  .qa-pass-banner { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); }
+  .qa-fail-banner { background:rgba(220,88,42,0.08); border:1px solid rgba(220,88,42,0.25); }
+  .qa-warn-banner { background:rgba(240,179,35,0.08); border:1px solid rgba(240,179,35,0.25); }
+  .qa-banner-icon { font-size:20px; }
+  .qa-banner-text { flex:1; }
+  .qa-banner-text strong { font-weight:600; }
+
+  /* ─── New Campaign Modal ─── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
+  .modal-overlay.show { display:flex; }
+  .modal { background:var(--bg-surface); border-radius:12px; border:1px solid var(--border); width:960px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+  .modal-header { padding:18px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .modal-header h3 { font-size:16px; font-weight:600; }
+  .modal-close { background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer; }
+  .modal-body { padding:24px; }
+  .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+
+  /* ─── Campaign Builder: Mode Picker ─── */
+  .builder-modes { display:flex; gap:20px; margin-bottom:0; }
+  .builder-mode { flex:1; background:var(--bg-body); border:2px dashed var(--border); border-radius:12px; padding:36px 24px; text-align:center; cursor:pointer; transition:all 0.15s; }
+  .builder-mode:hover { border-color:var(--i360-blue); background:rgba(40,172,226,0.04); }
+  .builder-mode.selected { border-color:var(--i360-blue); border-style:solid; background:rgba(40,172,226,0.06); }
+  .builder-mode .bm-icon { font-size:40px; margin-bottom:10px; }
+  .builder-mode h3 { font-size:16px; font-weight:600; margin-bottom:4px; }
+  .builder-mode p { font-size:12px; color:var(--text-muted); line-height:1.4; }
+
+  /* ─── Builder Form ─── */
+  .form-group { margin-bottom:16px; }
+  .form-label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+  .form-input, .form-select { width:100%; padding:9px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body); color:var(--text-primary); font-size:13px; }
+  .form-input:focus, .form-select:focus { outline:none; border-color:var(--i360-blue); box-shadow:0 0 0 2px rgba(40,172,226,0.15); }
+  .form-select { appearance:none; }
+  .form-row { display:flex; gap:12px; }
+  .form-row > * { flex:1; }
+
+  .drop-zone { border:2px dashed var(--border); border-radius:10px; padding:32px; text-align:center; cursor:pointer; transition:all 0.15s; }
+  .drop-zone:hover { border-color:var(--i360-blue); background:rgba(40,172,226,0.03); }
+  .drop-zone .dz-icon { font-size:32px; margin-bottom:8px; }
+  .drop-zone p { font-size:13px; color:var(--text-muted); }
+  .drop-zone .dz-hint { font-size:11px; color:var(--text-muted); margin-top:4px; }
+
+  /* ─── IO Preview (parsed) ─── */
+  .io-preview { background:var(--bg-body); border-radius:10px; border:1px solid var(--border); padding:18px; margin-top:16px; }
+  .io-preview-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .io-preview-header h4 { font-size:14px; font-weight:600; }
+  .io-preview-badge { font-size:11px; font-weight:600; padding:3px 10px; border-radius:10px; background:rgba(16,185,129,0.12); color:var(--success); }
+  .io-field-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
+  .io-field { font-size:12px; }
+  .io-field-label { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+  .io-field-val { font-weight:500; }
+
+  .io-lines-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .io-lines-table th { text-align:left; padding:6px 8px; color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); font-weight:600; }
+  .io-lines-table td { padding:7px 8px; border-bottom:1px solid var(--border-subtle); }
+  .io-lines-table tr:last-child td { border-bottom:none; }
+
+  /* ─── Scratch Builder Line Items Table ─── */
+  .li-table-wrap { border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--bg-body); }
+  .li-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .li-table th { padding:8px 6px; text-align:left; font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.4px; border-bottom:1px solid var(--border); background:var(--bg-surface); white-space:nowrap; }
+  .li-table td { padding:4px 3px; border-bottom:1px solid var(--border-subtle); }
+  .li-table tr:last-child td { border-bottom:none; }
+  .li-table input, .li-table select { width:100%; padding:6px 7px; border-radius:4px; border:1px solid transparent; background:transparent; color:var(--text-primary); font-size:12px; font-family:inherit; }
+  .li-table input:hover, .li-table select:hover { border-color:var(--border); background:var(--bg-surface); }
+  .li-table input:focus, .li-table select:focus { outline:none; border-color:var(--i360-blue); background:var(--bg-surface); box-shadow:0 0 0 2px rgba(40,172,226,0.12); }
+  .li-table input::placeholder { color:var(--text-muted); }
+  .li-table select { appearance:none; cursor:pointer; }
+  .li-table .row-num { color:var(--text-muted); font-size:11px; text-align:center; width:28px; min-width:28px; }
+  .li-table .del-row { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; padding:4px; border-radius:4px; opacity:0; transition:all 0.12s; }
+  .li-table tr:hover .del-row { opacity:1; }
+  .li-table .del-row:hover { color:var(--i360-red); background:rgba(220,88,42,0.1); }
+  .add-line-btn { background:none; border:1px dashed var(--border); border-radius:8px; padding:10px; width:100%; text-align:center; color:var(--text-muted); font-size:13px; transition:all 0.12s; }
+  .add-line-btn:hover { border-color:var(--i360-blue); color:var(--i360-blue); }
+
+  /* ─── Taxonomy Preview ─── */
+  .tax-preview { background:var(--bg-body); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-top:16px; }
+  .tax-preview-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .tax-preview-header h4 { font-size:13px; font-weight:600; }
+  .tax-preview-header .tax-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; background:var(--i360-blue-10); color:var(--i360-blue); }
+  .tax-level { margin-bottom:10px; }
+  .tax-level:last-child { margin-bottom:0; }
+  .tax-level-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; font-weight:600; }
+  .tax-string { font-family:'SF Mono',Menlo,Consolas,monospace; font-size:12px; color:var(--text-primary); background:var(--bg-surface); padding:6px 10px; border-radius:5px; border:1px solid var(--border-subtle); word-break:break-all; line-height:1.5; }
+  .tax-string .tax-sep { color:var(--i360-blue); font-weight:700; }
+  .tax-string .tax-empty { color:var(--i360-red); font-style:italic; opacity:0.6; }
+
+  /* ─── Wizard Steps ─── */
+  .wizard-steps { display:flex; gap:4px; margin-bottom:24px; }
+  .wizard-step { flex:1; height:4px; border-radius:2px; background:var(--border); }
+  .wizard-step.done { background:var(--success); }
+  .wizard-step.current { background:var(--i360-blue); }
+
+  /* ─── Reports Page ─── */
+  .reports-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .report-card { background:var(--bg-surface); border-radius:10px; border:1px solid var(--border); padding:20px; cursor:pointer; transition:all 0.15s; }
+  .report-card:hover { border-color:var(--i360-blue); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+  .report-card .r-icon { font-size:24px; margin-bottom:10px; }
+  .report-card h4 { font-size:14px; font-weight:600; margin-bottom:4px; }
+  .report-card p { font-size:12px; color:var(--text-muted); line-height:1.4; }
+  .report-card .r-meta { margin-top:12px; display:flex; gap:8px; }
+  .r-tag { font-size:10px; padding:2px 7px; border-radius:3px; background:var(--bg-body); color:var(--text-muted); }
+
+  /* ─── Overview Page ─── */
+  .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  .stat-card { background:var(--bg-surface); border-radius:10px; border:1px solid var(--border); padding:16px 18px; }
+  .stat-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+  .stat-value { font-size:24px; font-weight:700; }
+  .stat-delta { font-size:11px; margin-top:2px; }
+  .stat-delta.up { color:var(--success); }
+  .activity-feed { background:var(--bg-surface); border-radius:10px; border:1px solid var(--border); }
+  .activity-header { padding:14px 18px; border-bottom:1px solid var(--border); font-size:13px; font-weight:600; }
+  .activity-item { display:flex; gap:10px; padding:10px 18px; border-bottom:1px solid var(--border-subtle); font-size:13px; align-items:flex-start; }
+  .activity-item:last-child { border-bottom:none; }
+  .activity-dot { width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .activity-text { flex:1; color:var(--text-secondary); }
+  .activity-text strong { color:var(--text-primary); font-weight:600; }
+  .activity-time { font-size:11px; color:var(--text-muted); white-space:nowrap; }
+
+  /* ─── Checklist (reused in QA) ─── */
+  .checklist { list-style:none; }
+  .checklist li { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border-subtle); font-size:13px; }
+  .checklist li:last-child { border-bottom:none; }
+  .check-icon { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
+  .check-pass { background:rgba(16,185,129,0.15); color:var(--success); }
+  .check-fail { background:rgba(220,88,42,0.15); color:var(--i360-red); }
+  .check-warn { background:rgba(240,179,35,0.15); color:var(--i360-gold); }
+  .check-fail { background:rgba(220,88,42,0.15); color:var(--i360-red); }
+  .check-text { flex:1; }
+  .check-detail { font-size:11px; color:var(--text-muted); }
+
+  /* ---- Drag-to-fill ---- */
+  .fill-cell { position:relative; }
+  .fill-handle {
+    position:absolute; bottom:2px; right:2px; width:8px; height:8px;
+    background:var(--i360-blue); border:1px solid #fff; cursor:crosshair; z-index:2;
+    opacity:0; transition:opacity 0.15s;
+  }
+  .fill-cell:hover .fill-handle, .fill-cell.fill-active .fill-handle { opacity:1; }
+  .fill-highlight { background:rgba(40,172,226,0.10) !important; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark"><span class="logo-i">i</span><span class="logo-360">360</span><span class="logo-ads">Ads</span></div></div>
+    <div class="sidebar-nav">
+      <div class="nav-section">
+        <button class="nav-item active" onclick="showPage('overview',this)">◉&nbsp; Overview</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Manage</div>
+        <button class="nav-item" onclick="showPage('campaigns',this)">▤&nbsp; Campaigns</button>
+        <button class="nav-item" onclick="showPage('reports',this)">◩&nbsp; Reports</button>
+      </div>
+    </div>
+    <div class="sidebar-status">
+      <div class="status-label">Connections</div>
+      <div class="status-row"><span class="dot on"></span> Google Ads</div>
+      <div class="status-row"><span class="dot on"></span> StackAdapt</div>
+      <div class="status-row"><span class="dot on"></span> The Trade Desk</div>
+      <div class="status-row"><span class="dot on"></span> i360</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ═══ CAMPAIGNS LIST ═══ -->
+    <div class="page" id="page-campaigns">
+      <div class="topbar">
+        <div class="topbar-left"><h2>Campaigns</h2><span class="context">All platforms · 1 campaign</span></div>
+        <div class="topbar-right"><button class="btn btn-primary" onclick="openNewCampaign()">+ New Campaign</button></div>
+      </div>
+      <div style="padding:24px">
+        <div class="campaigns-toolbar">
+          <input class="search-input" placeholder="Search by name..." id="campSearch" oninput="applyFilters()" />
+          <select class="filter-select" id="filterMcode" onchange="applyFilters()"><option value="">All M-Codes</option></select>
+          <select class="filter-select" id="filterPlatform" onchange="applyFilters()"><option value="">All Platforms</option></select>
+          <select class="filter-select" id="filterAdvertiser" onchange="applyFilters()"><option value="">All Advertisers</option></select>
+          <button class="filter-pill on" onclick="filterStatus(this,'all')">All</button>
+          <button class="filter-pill" onclick="filterStatus(this,'live')">Live</button>
+          <button class="filter-pill" onclick="filterStatus(this,'draft')">Draft</button>
+          <button class="filter-pill" onclick="filterStatus(this,'scheduled')">Scheduled</button>
+          <button class="filter-pill" onclick="filterStatus(this,'ended')">Ended</button>
+        </div>
+        <table class="campaign-table">
+          <thead><tr><th>Campaign</th><th>Advertiser</th><th>Platform</th><th>Status</th><th>Spend</th><th>Budget</th><th>Pacing</th><th>Dates</th></tr></thead>
+          <tbody id="cTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ CAMPAIGN DETAIL / SCOREBOARD ═══ -->
+    <div class="page" id="page-detail">
+      <div class="topbar">
+        <div class="topbar-left"><button class="detail-back" onclick="showPage('campaigns',document.querySelector('.nav-item'))">← Campaigns</button></div>
+        <div class="topbar-right" id="detailActions"></div>
+      </div>
+      <div style="padding:24px" id="detailContent"></div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div class="page" id="page-reports">
+      <div class="topbar"><div class="topbar-left"><h2>Reports</h2><span class="context">Campaign performance &amp; analytics</span></div></div>
+      <div style="padding:24px">
+        <div style="text-align:center;padding:60px 20px">
+          <div style="font-size:48px;margin-bottom:12px;opacity:0.4">◩</div>
+          <h3 style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px">No reports configured yet</h3>
+          <p style="font-size:13px;color:var(--text-muted);max-width:380px;margin:0 auto;line-height:1.5">Reports will appear here once campaigns are live. You'll be able to generate cross-platform performance reports, placement breakdowns, and keyword analysis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div class="page active" id="page-overview">
+      <div class="topbar"><div class="topbar-left"><h2>Overview</h2><span class="context">April 2026 MTD</span></div><div class="topbar-right"><button class="btn btn-ghost">↻ Refresh</button></div></div>
+      <div style="padding:24px">
+        <div class="overview-grid">
+          <div class="stat-card"><div class="stat-label">Active Campaigns</div><div class="stat-value">1</div><div class="stat-delta">across 2 platforms</div></div>
+          <div class="stat-card"><div class="stat-label">Total Spend MTD</div><div class="stat-value">—</div><div class="stat-delta">campaign in draft</div></div>
+          <div class="stat-card"><div class="stat-label">Platforms in Use</div><div class="stat-value">2</div><div class="stat-delta">YouTube, The Trade Desk</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Launches</div><div class="stat-value">1</div><div class="stat-delta" style="color:var(--i360-gold)">needs QA before go-live</div></div>
+        </div>
+        <div class="activity-feed">
+          <div class="activity-header">Activity</div>
+          <div class="activity-item"><span class="activity-dot" style="background:var(--i360-blue)"></span><div class="activity-text"><strong>M20001 OmniTool Test</strong> campaign created as draft — awaiting QA</div><span class="activity-time">just now</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEW CAMPAIGN MODAL ═══ -->
+<div class="modal-overlay" id="newCampaignModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="ncTitle">New Campaign</h3>
+      <button class="modal-close" onclick="closeNewCampaign()">✕</button>
+    </div>
+    <div class="modal-body" id="ncBody"></div>
+    <div class="modal-footer" id="ncFooter"></div>
+  </div>
+</div>
+
+<!-- ═══ RUN QA MODAL ═══ -->
+<div class="modal-overlay" id="qaModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="qaTitle">QA Review</h3>
+      <button class="modal-close" onclick="closeQA()">✕</button>
+    </div>
+    <div class="modal-body" id="qaBody"></div>
+    <div class="modal-footer" id="qaFooter"></div>
+  </div>
+</div>
+
+<!-- ═══ EDIT IO MODAL ═══ -->
+<div class="modal-overlay" id="editIOModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="editIOTitle">Edit IO</h3>
+      <button class="modal-close" onclick="closeEditIO()">✕</button>
+    </div>
+    <div class="modal-body" id="editIOBody"></div>
+    <div class="modal-footer" id="editIOFooter"></div>
+  </div>
+</div>
+
+<script>
+// ─── Data ───
+const campaigns = [
+  { id:1, name:"OmniTool Test", mcode:"M20001", advertiser:"i360", kpi:"CPM", contact:"Brandon Hedger", projcode:"99999", casenum:"P-00001",
+    platforms:[{key:"youtube",label:"YouTube"},{key:"ttd",label:"The Trade Desk"}], status:"draft", spend:"—", budget:"$200", pacing:0, dates:"Apr 9 – Apr 30", qa:"none",
+    lines:[
+      {start:"2026-04-09",end:"2026-04-30",platform:"YouTube",geo:"VA",creative:"Video",goal:"Video Views",targeting:"35-55",campType:"Awareness",adType:"Video",adName:"Test",variation:"V1",size:"30",copy:"A",budget:"$100"},
+      {start:"2026-04-09",end:"2026-04-30",platform:"The Trade Desk",geo:"VA",creative:"Video",goal:"Video Views",targeting:"i360 High Affinity",campType:"Awareness",adType:"Video",adName:"Test",variation:"V1",size:"30",copy:"B",budget:"$100"}
+    ],
+    scores:{spend:"—",impr:"—",views:"—",cpm:"—",cpv:"—"} },
+];
+
+const tagClass = {youtube:'tag-youtube',youtubetv:'tag-youtubetv',ctv:'tag-ctv',meta:'tag-meta',programmatic:'tag-programmatic',sa:'tag-sa',search:'tag-search',ttd:'tag-ttd',linkedin:'tag-linkedin',x:'tag-x'};
+const statusClass = {live:'s-live',paused:'s-paused',draft:'s-draft',scheduled:'s-scheduled',ended:'s-ended'};
+
+// ─── Nav ───
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); btn.classList.add('active'); }
+}
+
+// ─── Filter State ───
+let activeStatus = 'all';
+
+// Populate filter dropdowns
+function populateFilters() {
+  const mcodes = [...new Set(campaigns.map(c=>c.mcode))].sort();
+  const platforms = [...new Set(campaigns.flatMap(c=>c.platforms.map(p=>p.label)))].sort();
+  const advertisers = [...new Set(campaigns.map(c=>c.advertiser))].sort();
+  const mSel = document.getElementById('filterMcode');
+  const pSel = document.getElementById('filterPlatform');
+  const aSel = document.getElementById('filterAdvertiser');
+  mcodes.forEach(m => { const o=document.createElement('option'); o.value=m; o.textContent=m; mSel.appendChild(o); });
+  platforms.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p; pSel.appendChild(o); });
+  advertisers.forEach(a => { const o=document.createElement('option'); o.value=a; o.textContent=a; aSel.appendChild(o); });
+}
+populateFilters();
+
+// ─── Campaign Table ───
+function renderTable() {
+  const search = (document.getElementById('campSearch')?.value||'').toLowerCase();
+  const fMcode = document.getElementById('filterMcode')?.value||'';
+  const fPlat = document.getElementById('filterPlatform')?.value||'';
+  const fAdv = document.getElementById('filterAdvertiser')?.value||'';
+
+  const data = campaigns.filter(c => {
+    if(activeStatus!=='all' && c.status!==activeStatus) return false;
+    if(fMcode && c.mcode!==fMcode) return false;
+    if(fPlat && !c.platforms.some(p=>p.label===fPlat)) return false;
+    if(fAdv && c.advertiser!==fAdv) return false;
+    if(search && !c.name.toLowerCase().includes(search) && !c.mcode.toLowerCase().includes(search) && !c.advertiser.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  document.getElementById('cTableBody').innerHTML = data.map(c => {
+    const pColor = c.pacing>85?'var(--i360-red)':c.pacing>70?'var(--i360-gold)':'var(--success)';
+    const platformsHTML = c.platforms.map(p=>`<span class="platform-tag ${tagClass[p.key]||''}">${p.label}</span>`).join('');
+    return `<tr onclick="openDetail(${c.id})">
+      <td class="c-name">${c.name}<small>${c.mcode}</small></td>
+      <td style="font-size:12px;color:var(--text-secondary)">${c.advertiser}</td>
+      <td><div class="platform-tags">${platformsHTML}</div></td>
+      <td><span class="status-pill ${statusClass[c.status]}">${c.status}</span></td>
+      <td>${c.spend}</td>
+      <td style="color:var(--text-muted)">${c.budget}</td>
+      <td>${c.pacing?`<span class="pacing-bar"><span class="pacing-fill" style="width:${c.pacing}%;background:${pColor}"></span></span>${c.pacing}%`:'—'}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${c.dates}</td>
+    </tr>`;
+  }).join('');
+}
+renderTable();
+
+function filterStatus(el, f) {
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  activeStatus = f;
+  renderTable();
+}
+function applyFilters() { renderTable(); }
+
+// ─── Campaign Detail ───
+function openDetail(id) {
+  const c = campaigns.find(x=>x.id===id);
+  if(!c) return;
+
+  // QA banner
+  let qaBanner = '';
+  const qaTime = c.qaTimestamp ? ` · Last run ${c.qaTimestamp}` : '';
+  if(c.qa==='pass') qaBanner = `<div class="qa-banner qa-pass-banner"><span class="qa-banner-icon">✅</span><div class="qa-banner-text"><strong>QA Passed</strong> — all checks verified against IO${qaTime}</div><button class="btn btn-ghost" style="font-size:12px" onclick="runQA(${c.id})">Re-run</button></div>`;
+  else if(c.qa==='fail') qaBanner = `<div class="qa-banner qa-fail-banner"><span class="qa-banner-icon">❌</span><div class="qa-banner-text"><strong>QA Failed</strong> — issues found that need attention${qaTime}</div><button class="btn btn-ghost" style="font-size:12px" onclick="runQA(${c.id})">View Details</button></div>`;
+  else if(c.qa==='warn') qaBanner = `<div class="qa-banner qa-warn-banner"><span class="qa-banner-icon">⚠️</span><div class="qa-banner-text"><strong>QA Warnings</strong> — no blockers, but some fields need review${qaTime}</div><button class="btn btn-ghost" style="font-size:12px" onclick="runQA(${c.id})">View Details</button></div>`;
+
+  // Score cards
+  const sk = Object.keys(c.scores);
+  const scoreHTML = sk.map(k => `<div class="score-card"><div class="score-label">${k}</div><div class="score-val">${c.scores[k]}</div></div>`).join('');
+
+  // Line items — use consistent display order
+  const lineDisplayCols = ['start','end','platform','geo','creative','goal','targeting','adName','variation','size','copy','budget'];
+  const lineColLabels = {start:'Start',end:'End',platform:'Platform',geo:'Geo',creative:'Creative',goal:'Goal',targeting:'Targeting',adName:'Ad Name',variation:'Var.',size:'Size',copy:'Copy',budget:'Budget'};
+  const lineHeaders = lineDisplayCols;
+  const lineRows = c.lines.map(l => `<tr>${lineDisplayCols.map(h=>`<td>${l[h]||'—'}</td>`).join('')}</tr>`).join('');
+
+  document.getElementById('detailActions').innerHTML = `
+    <button class="btn btn-ghost" onclick="runQA(${c.id})">Run QA</button>
+    <button class="btn btn-ghost" onclick="editIO(${c.id})">Edit IO</button>
+    ${c.status==='draft'||c.status==='scheduled'?'<button class="btn btn-primary">Launch Campaign</button>':''}
+  `;
+
+  document.getElementById('detailContent').innerHTML = `
+    ${qaBanner}
+    <div class="detail-header">
+      <div class="detail-title">
+        <h2>${c.name}</h2>
+        <div class="detail-meta">
+          <span><strong>${c.mcode}</strong></span>
+          <span>${c.advertiser}</span>
+          <span class="platform-tags">${c.platforms.map(p=>`<span class="platform-tag ${tagClass[p.key]||''}">${p.label}</span>`).join('')}</span>
+          <span><span class="status-pill ${statusClass[c.status]}">${c.status}</span></span>
+          <span>${c.dates}</span>
+          ${c.kpi?`<span style="color:var(--text-muted)">KPI: ${c.kpi}</span>`:''}
+          ${c.projcode?`<span style="color:var(--text-muted)">Project: ${c.projcode}</span>`:''}
+          ${c.casenum?`<span style="color:var(--text-muted)">Case: ${c.casenum}</span>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="score-grid">${scoreHTML}</div>
+    <div class="section-title">Line Items</div>
+    <div style="overflow-x:auto">
+    <table class="line-items-table" style="min-width:1200px">
+      <thead><tr>${lineHeaders.map(h=>`<th style="font-size:11px">${lineColLabels[h]||h}</th>`).join('')}</tr></thead>
+      <tbody>${lineRows}</tbody>
+    </table>
+    </div>
+  `;
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+}
+
+// ─── New Campaign Modal ───
+let ncStep = 0;
+let ncMode = ''; // 'upload' or 'scratch'
+let ncFormData = null; // collected before QA step
+let ncStep1Cache = null; // cached DOM + title from step 1 for back navigation
+let ncStep2Cache = null; // cached DOM + title from step 2 for back navigation
+
+function openNewCampaign() {
+  ncStep=0; ncMode='';
+  renderNC();
+  document.getElementById('newCampaignModal').classList.add('show');
+}
+function closeNewCampaign() { document.getElementById('newCampaignModal').classList.remove('show'); }
+
+function renderNC() {
+  const body = document.getElementById('ncBody');
+  const footer = document.getElementById('ncFooter');
+  const title = document.getElementById('ncTitle');
+
+  if(ncStep===0) {
+    // Mode picker
+    title.textContent = 'New Campaign';
+    body.innerHTML = `
+      <div class="builder-modes">
+        <div class="builder-mode" onclick="selectMode('upload')">
+          <div class="bm-icon">📄</div>
+          <h3>Upload IO</h3>
+          <p>Drop a signed IO (PDF) and we'll parse the line items, pre-fill everything, and run QA automatically</p>
+        </div>
+        <div class="builder-mode" onclick="selectMode('scratch')">
+          <div class="bm-icon">✏️</div>
+          <h3>Build from Scratch</h3>
+          <p>Manually enter campaign details and line items using the IO form fields</p>
+        </div>
+      </div>
+    `;
+    footer.innerHTML = `<button class="btn btn-ghost" onclick="closeNewCampaign()">Cancel</button>`;
+
+  } else if(ncStep===1 && ncMode==='upload') {
+    // Upload IO
+    title.textContent = 'Upload IO';
+    body.innerHTML = `
+      <div class="wizard-steps"><span class="wizard-step current"></span><span class="wizard-step"></span><span class="wizard-step"></span><span class="wizard-step"></span></div>
+      <input type="file" id="ioFileInput" accept=".pdf" style="display:none" />
+      <div class="drop-zone" id="ioDropZone">
+        <div class="dz-icon">📄</div>
+        <p>Drop your signed IO here, or click to browse</p>
+        <div class="dz-hint">Accepts PDF — we'll extract all line items automatically</div>
+      </div>
+      <div id="ioParsed" style="display:none">
+        <div class="io-preview">
+          <div class="io-preview-header">
+            <h4>Parsed IO</h4>
+            <span class="io-preview-badge">✓ Extracted</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px;font-style:italic" id="ioParseNote">Simulated parse — in production, fields are auto-extracted from the IO PDF. Edit any values below.</div>
+          <div class="io-field-grid" id="ioFieldGrid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+            <div class="io-field"><div class="io-field-label">Advertiser</div><div class="io-field-val"><input class="form-input" id="io_adv" value="" placeholder="Advertiser" style="padding:5px 8px;font-size:12px" oninput="updateIOTaxPreview()" /></div></div>
+            <div class="io-field"><div class="io-field-label">i360 Campaign Code</div><div class="io-field-val"><input class="form-input" id="io_mcode" value="" placeholder="M2026XXX" style="padding:5px 8px;font-size:12px" oninput="updateIOTaxPreview()" /></div></div>
+            <div class="io-field"><div class="io-field-label">KPI(s)</div><div class="io-field-val"><input class="form-input" id="io_kpi" value="" placeholder="e.g. CPM, Video Views" style="padding:5px 8px;font-size:12px" /></div></div>
+            <div class="io-field"><div class="io-field-label">Campaign Contact</div><div class="io-field-val"><input class="form-input" id="io_contact" value="" placeholder="Name" style="padding:5px 8px;font-size:12px" /></div></div>
+            <div class="io-field" style="grid-column:span 2"><div class="io-field-label">Project Name</div><div class="io-field-val"><input class="form-input" id="io_name" value="" placeholder="Campaign name" style="padding:5px 8px;font-size:12px" oninput="updateIOTaxPreview()" /></div></div>
+            <div class="io-field"><div class="io-field-label">Project Code</div><div class="io-field-val"><input class="form-input" id="io_projcode" value="" placeholder="e.g. 75001" style="padding:5px 8px;font-size:12px" oninput="updateIOTaxPreview()" /></div></div>
+            <div class="io-field"><div class="io-field-label">Case Number</div><div class="io-field-val"><input class="form-input" id="io_casenum" value="" placeholder="e.g. P-41796" style="padding:5px 8px;font-size:12px" oninput="updateIOTaxPreview()" /></div></div>
+            <div class="io-field"><div class="io-field-label">Flight Start</div><div class="io-field-val"><input type="date" class="form-input" id="io_start" style="padding:5px 8px;font-size:12px" /></div></div>
+            <div class="io-field"><div class="io-field-label">Flight End</div><div class="io-field-val"><input type="date" class="form-input" id="io_end" style="padding:5px 8px;font-size:12px" /></div></div>
+            <div class="io-field"><div class="io-field-label">Total Budget</div><div class="io-field-val"><input class="form-input" id="io_budget" value="" placeholder="$0.00" style="padding:5px 8px;font-size:12px" /></div></div>
+            <div class="io-field"><div class="io-field-label">Line Items</div><div class="io-field-val" id="ioLineCountDisplay" style="font-weight:600;font-size:12px;padding:6px 0">—</div></div>
+          </div>
+          <div class="section-title" style="font-size:12px;margin-bottom:6px;margin-top:12px">Line Items</div>
+          <div class="li-table-wrap" style="overflow-x:auto">
+            <table class="li-table" id="ioLinesTable" style="min-width:1440px">
+              <thead>
+                <tr>
+                  <th style="width:28px">#</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Platform</th>
+                  <th>Geo</th>
+                  <th>Creative</th>
+                  <th>Goal</th>
+                  <th>Targeting</th>
+                  <th>Budget</th>
+                  <th style="width:28px"></th>
+                </tr>
+              </thead>
+              <tbody id="ioLinesBody"></tbody>
+            </table>
+          </div>
+          <button class="add-line-btn" style="margin-top:8px" onclick="addIOLineRow()">+ Add Line Item</button>
+        </div>
+        <div class="tax-preview" style="margin-top:14px" id="ioTaxPreview">
+          <div class="tax-preview-header"><h4>Generated Taxonomy</h4><div class="tax-badge">Live</div></div>
+          <div id="ioTaxContent"><div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div></div>
+        </div>
+      </div>
+    `;
+    footer.innerHTML = `<button class="btn btn-ghost" onclick="ncStep=0;ncStep1Cache=null;renderNC()">← Back</button><button class="btn btn-primary" id="ioNextBtn" style="opacity:0.5;pointer-events:none" onclick="advanceToCreative()">Creative Upload →</button>`;
+
+    // Wire up real file input
+    const dz = document.getElementById('ioDropZone');
+    const fi = document.getElementById('ioFileInput');
+    dz.addEventListener('click', () => fi.click());
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.style.borderColor = 'var(--i360-blue)'; dz.style.background = 'rgba(40,172,226,0.06)'; });
+    dz.addEventListener('dragleave', () => { dz.style.borderColor = ''; dz.style.background = ''; });
+    dz.addEventListener('drop', (e) => { e.preventDefault(); dz.style.borderColor = ''; dz.style.background = ''; if(e.dataTransfer.files.length) handleIOFile(e.dataTransfer.files[0]); });
+    fi.addEventListener('change', () => { if(fi.files.length) handleIOFile(fi.files[0]); });
+
+  } else if(ncStep===1 && ncMode==='scratch') {
+    // Build from scratch
+    title.textContent = 'Build Campaign';
+    body.innerHTML = `
+      <div class="wizard-steps"><span class="wizard-step current"></span><span class="wizard-step"></span><span class="wizard-step"></span><span class="wizard-step"></span></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Advertiser</label><input class="form-input" id="sf_adv" placeholder="e.g. AFP, Libre, AFPA" oninput="updateTaxPreview()" /></div>
+        <div class="form-group"><label class="form-label">i360 Campaign Code</label><input class="form-input" id="sf_mcode" placeholder="M2026XXX" oninput="updateTaxPreview()" /></div>
+        <div class="form-group"><label class="form-label">KPI(s)</label><input class="form-input" id="sf_kpi" placeholder="e.g. CPM, Video Views" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:2"><label class="form-label">Project Name</label><input class="form-input" id="sf_name" placeholder="Campaign name" oninput="updateTaxPreview()" /></div>
+        <div class="form-group"><label class="form-label">Campaign Contact</label><input class="form-input" id="sf_contact" placeholder="Name or email" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Project Code</label><input class="form-input" id="sf_projcode" placeholder="e.g. 75001" oninput="updateTaxPreview()" /></div>
+        <div class="form-group"><label class="form-label">Case Number</label><input class="form-input" id="sf_casenum" placeholder="e.g. P-41796" oninput="updateTaxPreview()" /></div>
+      </div>
+
+      <div class="section-title" style="margin-top:20px;margin-bottom:8px">Line Items</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">IO fields + taxonomy fields — naming convention is generated automatically below</div>
+      <div class="li-table-wrap" style="overflow-x:auto">
+        <table class="li-table" style="min-width:1440px">
+          <thead>
+            <tr>
+              <th style="width:28px">#</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Platform</th>
+              <th>Geo</th>
+              <th>Creative</th>
+              <th>Goal</th>
+              <th>Targeting</th>
+              <th>Budget</th>
+              <th style="width:28px"></th>
+            </tr>
+          </thead>
+          <tbody id="liTableBody"></tbody>
+        </table>
+      </div>
+      <button class="add-line-btn" style="margin-top:8px" onclick="addLineRow()">+ Add Line Item</button>
+      <div class="tax-preview" id="taxPreviewLive">
+        <div class="tax-preview-header"><h4>Naming Convention Preview</h4><div class="tax-badge">Live</div></div>
+        <div id="taxPreviewContent"><div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div></div>
+      </div>
+    `;
+    seedLineRows(2);
+    footer.innerHTML = `<button class="btn btn-ghost" onclick="ncStep=0;ncStep1Cache=null;renderNC()">← Back</button><button class="btn btn-primary" onclick="advanceToCreative()">Creative Upload →</button>`;
+
+  } else if(ncStep===2) {
+    // Creative Upload — Ad Name, Variant, Size, Copy per line + file upload
+    title.textContent = 'Creative Upload';
+    /* Pull line item data from the cached step 1 DOM */
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = ncStep1Cache ? ncStep1Cache.html : '';
+    const srcBody = tempDiv.querySelector('#ioLinesBody') || tempDiv.querySelector('#liTableBody');
+    const lineData = [];
+    if (srcBody) {
+      Array.from(srcBody.rows).forEach((row, idx) => {
+        const sels = row.querySelectorAll('select');
+        const inps = row.querySelectorAll('input');
+        lineData.push({
+          num: idx + 1,
+          platform: sels[0]?.getAttribute('value') || sels[0]?.value || Array.from(sels[0]?.options||[]).find(o=>o.hasAttribute('selected'))?.value || '',
+          geo: inps[2]?.getAttribute('value') || inps[2]?.value || '',
+          creative: sels[1]?.getAttribute('value') || sels[1]?.value || Array.from(sels[1]?.options||[]).find(o=>o.hasAttribute('selected'))?.value || '',
+          goal: sels[2]?.getAttribute('value') || sels[2]?.value || Array.from(sels[2]?.options||[]).find(o=>o.hasAttribute('selected'))?.value || ''
+        });
+      });
+    }
+    const creativeRows = lineData.map(d => `<tr>
+      <td class="row-num">${d.num}</td>
+      <td style="font-size:11px;color:var(--text-secondary);white-space:nowrap">${d.platform || '—'}</td>
+      <td style="font-size:11px;color:var(--text-secondary);white-space:nowrap">${d.creative || '—'}</td>
+      <td style="font-size:11px;color:var(--text-secondary);white-space:nowrap">${d.geo || '—'}</td>
+      <td class="fill-cell"><input placeholder="e.g. Primary" style="width:100%" oninput="updateCreativeTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+      <td class="fill-cell"><input placeholder="e.g. V1" style="width:60px" oninput="updateCreativeTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+      <td class="fill-cell"><input placeholder="e.g. Square/15" style="width:110px" oninput="updateCreativeTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+      <td class="fill-cell"><input placeholder="e.g. A" style="width:60px" oninput="updateCreativeTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    </tr>`).join('');
+
+    /* Group by platform for the file upload sections */
+    const platGroups = {};
+    lineData.forEach(d => { if(d.platform) { if(!platGroups[d.platform]) platGroups[d.platform]=[]; platGroups[d.platform].push(d); } });
+    const uploadSections = Object.entries(platGroups).map(([plat, lines]) => {
+      const creativeSizes = [...new Set(lines.map(l=>l.creative).filter(Boolean))].join(', ') || 'TBD';
+      return `<div style="background:var(--bg-body);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:600;color:var(--text-primary)">${plat}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${lines.length} line item${lines.length!==1?'s':''} · ${creativeSizes}</div>
+        </div>
+        <div class="drop-zone" style="padding:18px;min-height:auto;border-style:dashed;cursor:pointer" onclick="this.querySelector('input')?.click()">
+          <input type="file" multiple accept=".jpg,.jpeg,.png,.mp4,.mov,.wav,.mp3" style="display:none" onchange="handleCreativeFiles(this,'${plat}')" />
+          <div style="font-size:12px;color:var(--text-muted)">📎 Drop creative files for <strong>${plat}</strong>, or click to browse</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Images (JPG, PNG) · Video (MP4, MOV) · Audio (WAV, MP3)</div>
+        </div>
+        <div id="creativeFiles_${plat.replace(/\s+/g,'_')}" style="margin-top:6px;font-size:11px;color:var(--text-secondary)"></div>
+      </div>`;
+    }).join('');
+
+    body.innerHTML = `
+      <div class="wizard-steps"><span class="wizard-step done"></span><span class="wizard-step current"></span><span class="wizard-step"></span><span class="wizard-step"></span></div>
+      <div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">Define creative details for each line item and upload assets by platform</div>
+      <div class="section-title" style="font-size:12px;margin-bottom:6px">Ad Creative Details</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Platform, Creative Type, and Geo are read-only from Step 1. Fill in Ad Name, Variation, Size, and Copy for each line.</div>
+      <div class="li-table-wrap" style="overflow-x:auto">
+        <table class="li-table" id="creativeLinesTable" style="min-width:900px">
+          <thead>
+            <tr>
+              <th style="width:28px">#</th>
+              <th>Platform</th>
+              <th>Creative</th>
+              <th>Geo</th>
+              <th>Ad Name</th>
+              <th style="width:60px">Var.</th>
+              <th style="width:110px">Size / Length</th>
+              <th style="width:60px">Copy</th>
+            </tr>
+          </thead>
+          <tbody id="creativeLinesBody">${creativeRows}</tbody>
+        </table>
+      </div>
+      <div class="section-title" style="font-size:12px;margin-bottom:6px;margin-top:18px">Creative Assets by Platform</div>
+      ${uploadSections || '<div style="font-size:12px;color:var(--text-muted);font-style:italic">No platforms detected — go back and select platforms on your line items.</div>'}
+      <div class="section-title" style="font-size:12px;margin-bottom:6px;margin-top:18px">Generated Ad Taxonomy</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Full taxonomy including Ad-level naming generated from line items and creative details above.</div>
+      <div id="creativeTaxContent" style="background:var(--bg-body);border-radius:8px;padding:14px 16px;font-family:'Rubik',sans-serif">
+        <div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in Ad Name fields above to see the generated Ad taxonomy…</div>
+      </div>
+    `;
+    footer.innerHTML = `<button class="btn btn-ghost" onclick="goBackToStep1()">← Back</button><button class="btn btn-primary" onclick="advanceToQA()">Review QA →</button>`;
+    setTimeout(updateCreativeTaxPreview, 50);
+
+  } else if(ncStep===3) {
+    // QA Review — dynamic from form data
+    const fd = ncFormData || { adv:'—', mcode:'—', name:'—', lineCount:0, platforms:[], totalBudget:0, geos:[] };
+    const taxLabel = [fd.mcode, fd.adv, fd.name].filter(Boolean).join('#') || '—';
+    const platStr = fd.platforms.length ? fd.platforms.join(' + ') : 'None selected';
+    const geoStr = fd.geos.length ? fd.geos.join(', ') : 'None specified';
+    const budgetStr = fd.totalBudget > 0 ? '$' + fd.totalBudget.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '$0.00';
+    const nameOk = fd.mcode && fd.adv && fd.name;
+    const hasPlatforms = fd.platforms.length > 0;
+    const hasGeo = fd.geos.length > 0;
+    const hasBudget = fd.totalBudget > 0;
+    const hasCreative = fd.creativeLines && fd.creativeLines.some(l => l.adName);
+
+    title.textContent = 'QA Review';
+    body.innerHTML = `
+      <div class="wizard-steps"><span class="wizard-step done"></span><span class="wizard-step done"></span><span class="wizard-step current"></span><span class="wizard-step"></span></div>
+      <div style="margin-bottom:16px;font-size:13px;color:var(--text-secondary)">Reviewing <strong style="color:var(--text-primary)">${fd.mcode||'—'} — ${fd.name||'Untitled'}</strong></div>
+      <ul class="checklist">
+        <li><span class="check-icon ${nameOk?'check-pass':'check-warn'}">${nameOk?'✓':'!'}</span><div><div class="check-text">Campaign naming convention</div><div class="check-detail" ${nameOk?'':'style="color:var(--i360-gold)"'}>${nameOk ? 'Matches taxonomy: '+taxLabel : 'Missing fields — need M-Code, Advertiser, and Name'}</div></div></li>
+        <li><span class="check-icon ${nameOk?'check-pass':'check-warn'}">${nameOk?'✓':'!'}</span><div><div class="check-text">Taxonomy — all levels generated</div><div class="check-detail" ${nameOk?'':'style="color:var(--i360-gold)"'}>${nameOk ? 'Campaign, Ad Set, and Ad names follow #-delimited convention for '+fd.lineCount+' line item'+(fd.lineCount!==1?'s':'') : 'Complete header fields to generate taxonomy'}</div></div></li>
+        <li><span class="check-icon check-pass">✓</span><div><div class="check-text">Taxonomy — field validation</div><div class="check-detail">Goal (campaign level) & Creative (ad set level) values from approved field list</div></div></li>
+        <li><span class="check-icon ${hasBudget?'check-pass':'check-warn'}">${hasBudget?'✓':'!'}</span><div><div class="check-text">Budget totals</div><div class="check-detail" ${hasBudget?'':'style="color:var(--i360-gold)"'}>${hasBudget ? 'Line items sum to '+budgetStr : 'No budget entered yet'}</div></div></li>
+        <li><span class="check-icon check-pass">✓</span><div><div class="check-text">Flight dates</div><div class="check-detail">Dates will be validated at launch</div></div></li>
+        <li><span class="check-icon ${hasGeo?'check-pass':'check-warn'}">${hasGeo?'✓':'!'}</span><div><div class="check-text">Geo targeting</div><div class="check-detail" ${hasGeo?'':'style="color:var(--i360-gold)"'}>${hasGeo ? geoStr+' specified across line items' : 'No geo specified yet'}</div></div></li>
+        <li><span class="check-icon ${hasPlatforms?'check-pass':'check-warn'}">${hasPlatforms?'✓':'!'}</span><div><div class="check-text">Platform coverage</div><div class="check-detail" ${hasPlatforms?'':'style="color:var(--i360-gold)"'}>${hasPlatforms ? platStr+' — accounts will be matched at launch' : 'No platforms selected yet'}</div></div></li>
+        <li><span class="check-icon ${hasCreative?'check-pass':'check-warn'}">${hasCreative?'✓':'!'}</span><div><div class="check-text">Creative assets</div><div class="check-detail" ${hasCreative?'':'style="color:var(--i360-gold)"'}>${hasCreative ? fd.creativeLines.filter(l=>l.adName).length+' of '+fd.lineCount+' lines have creative details' : 'No creative details entered yet'}</div></div></li>
+        <li><span class="check-icon check-pass">✓</span><div><div class="check-text">Tracking setup</div><div class="check-detail">i360 pixel template ready for deployment</div></div></li>
+      </ul>
+    `;
+    footer.innerHTML = `<button class="btn btn-ghost" onclick="goBackToStep2()">← Back</button><button class="btn btn-primary" onclick="ncStep=4;renderNC()">Save as Draft →</button>`;
+
+  } else if(ncStep===4) {
+    // Summary / Done — no platform launch, draft only
+    const fd = ncFormData || { adv:'—', mcode:'—', name:'—', lineCount:0, platforms:[], totalBudget:0, geos:[] };
+    const budgetStr = fd.totalBudget > 0 ? '$' + fd.totalBudget.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+    const platStr = fd.platforms.length ? fd.platforms.join(', ') : '—';
+    title.textContent = 'Campaign Saved';
+    body.innerHTML = `
+      <div class="wizard-steps"><span class="wizard-step done"></span><span class="wizard-step done"></span><span class="wizard-step done"></span><span class="wizard-step current"></span></div>
+      <div style="text-align:center;padding:28px 0">
+        <div style="font-size:48px;margin-bottom:8px">✅</div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:6px">${fd.mcode||'—'} — ${fd.name||'Untitled'}</h3>
+        <p style="font-size:13px;color:var(--text-muted);max-width:400px;margin:0 auto;line-height:1.5">Campaign saved as <strong style="color:var(--text-primary)">Draft</strong> with ${fd.lineCount} line item${fd.lineCount!==1?'s':''}. Ready for launch.</p>
+        <div style="margin-top:14px;padding:10px 16px;background:rgba(40,172,226,0.08);border:1px solid rgba(40,172,226,0.2);border-radius:8px;display:inline-block;font-size:12px;color:var(--i360-blue)">
+          <strong>Demo Mode</strong> — No API calls made. In production this will push to ${platStr !== '—' ? platStr : 'connected platforms'}.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:8px">
+        <div style="background:var(--bg-body);border-radius:8px;padding:12px 20px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Budget</div>
+          <div style="font-size:16px;font-weight:600">${budgetStr}</div>
+        </div>
+        <div style="background:var(--bg-body);border-radius:8px;padding:12px 20px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Platforms</div>
+          <div style="font-size:16px;font-weight:600">${platStr}</div>
+        </div>
+        <div style="background:var(--bg-body);border-radius:8px;padding:12px 20px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Line Items</div>
+          <div style="font-size:16px;font-weight:600">${fd.lineCount}</div>
+        </div>
+      </div>
+    `;
+    footer.innerHTML = `<button class="btn btn-ghost" onclick="closeNewCampaign()">Close</button><button class="btn btn-primary" onclick="closeNewCampaign()">Go to Dashboard →</button>`;
+  }
+}
+
+function selectMode(mode) {
+  ncMode = mode;
+  ncStep = 1;
+  renderNC();
+}
+function validateLineItems() {
+  /* Check that every field in every line item row is filled */
+  const tbody = document.getElementById('ioLinesBody') || document.getElementById('liTableBody');
+  if (!tbody || !tbody.rows.length) return { ok: false, errors: ['No line items found.'] };
+  const errors = [];
+  Array.from(tbody.rows).forEach((row, ri) => {
+    const sels = row.querySelectorAll('select');
+    const inps = row.querySelectorAll('input');
+    /* Inputs: 0=start, 1=end, 2=geo, 3=targeting, 4=budget */
+    /* Selects: 0=platform, 1=creative, 2=goal */
+    const fields = [
+      { val: inps[0]?.value, name: 'Start Date' },
+      { val: inps[1]?.value, name: 'End Date' },
+      { val: sels[0]?.value, name: 'Platform' },
+      { val: inps[2]?.value?.trim(), name: 'Geo' },
+      { val: sels[1]?.value, name: 'Creative' },
+      { val: sels[2]?.value, name: 'Goal' },
+      { val: inps[3]?.value?.trim(), name: 'Targeting' },
+      { val: inps[4]?.value?.trim(), name: 'Budget' }
+    ];
+    const missing = fields.filter(f => !f.val).map(f => f.name);
+    if (missing.length) errors.push(`Line ${ri+1}: missing ${missing.join(', ')}`);
+  });
+  return { ok: errors.length === 0, errors };
+}
+
+function showValidationError(v) {
+  let errDiv = document.getElementById('liValidationError');
+  if (!errDiv) {
+    errDiv = document.createElement('div');
+    errDiv.id = 'liValidationError';
+    errDiv.style.cssText = 'background:rgba(220,88,42,0.08);border:1px solid rgba(220,88,42,0.3);border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--i360-red);';
+    const tbody = document.getElementById('ioLinesBody') || document.getElementById('liTableBody') || document.getElementById('creativeLinesBody');
+    const tableWrap = tbody?.closest('.li-table-wrap') || tbody?.closest('table')?.parentElement;
+    if (tableWrap) tableWrap.parentNode.insertBefore(errDiv, tableWrap);
+  }
+  errDiv.innerHTML = '<div style="font-weight:600;margin-bottom:6px">⚠ All fields are required</div>' + v.errors.map(e => '<div style="margin-left:8px;line-height:1.6">• ' + e + '</div>').join('');
+  errDiv.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function bakeFormValues() {
+  const body = document.getElementById('ncBody');
+  body.querySelectorAll('input, textarea').forEach(el => { el.setAttribute('value', el.value); });
+  body.querySelectorAll('select').forEach(sel => {
+    Array.from(sel.options).forEach(opt => {
+      if (opt.selected) opt.setAttribute('selected', 'selected');
+      else opt.removeAttribute('selected');
+    });
+  });
+}
+
+/* Step 1 → Step 2 (Creative Upload) */
+function advanceToCreative() {
+  const v = validateLineItems();
+  if (!v.ok) {
+    showValidationError(v);
+    return;
+  }
+  const errDiv = document.getElementById('liValidationError');
+  if (errDiv) errDiv.remove();
+  bakeFormValues();
+  const body = document.getElementById('ncBody');
+  const title = document.getElementById('ncTitle');
+  ncStep1Cache = { html: body.innerHTML, title: title.textContent };
+  ncStep = 2;
+  renderNC();
+}
+
+/* Step 2 → Step 3 (Review QA) */
+function advanceToQA() {
+  /* Validate creative fields */
+  const tbody = document.getElementById('creativeLinesBody');
+  if (!tbody || !tbody.rows.length) return;
+  const errors = [];
+  Array.from(tbody.rows).forEach((row, ri) => {
+    const inps = row.querySelectorAll('input');
+    const fields = [
+      { val: inps[0]?.value?.trim(), name: 'Ad Name' },
+      { val: inps[1]?.value?.trim(), name: 'Variation' },
+      { val: inps[2]?.value?.trim(), name: 'Size' },
+      { val: inps[3]?.value?.trim(), name: 'Copy' }
+    ];
+    const missing = fields.filter(f => !f.val).map(f => f.name);
+    if (missing.length) errors.push(`Line ${ri+1}: missing ${missing.join(', ')}`);
+  });
+  if (errors.length) {
+    showValidationError({ errors });
+    return;
+  }
+  const errDiv = document.getElementById('liValidationError');
+  if (errDiv) errDiv.remove();
+  bakeFormValues();
+  const body = document.getElementById('ncBody');
+  const title = document.getElementById('ncTitle');
+  ncStep2Cache = { html: body.innerHTML, title: title.textContent };
+  ncFormData = collectFormData();
+  ncStep = 3;
+  renderNC();
+}
+
+function goBackToStep1() {
+  ncStep = 1;
+  if (ncStep1Cache) {
+    const body = document.getElementById('ncBody');
+    const title = document.getElementById('ncTitle');
+    const footer = document.getElementById('ncFooter');
+    body.innerHTML = ncStep1Cache.html;
+    title.textContent = ncStep1Cache.title;
+    footer.innerHTML = '<button class="btn btn-ghost" onclick="ncStep=0;ncStep1Cache=null;renderNC()">← Back</button><button class="btn btn-primary" onclick="advanceToCreative()">Creative Upload →</button>';
+  } else {
+    renderNC();
+  }
+}
+
+function goBackToStep2() {
+  ncStep = 2;
+  if (ncStep2Cache) {
+    const body = document.getElementById('ncBody');
+    const title = document.getElementById('ncTitle');
+    const footer = document.getElementById('ncFooter');
+    body.innerHTML = ncStep2Cache.html;
+    title.textContent = ncStep2Cache.title;
+    footer.innerHTML = '<button class="btn btn-ghost" onclick="goBackToStep1()">← Back</button><button class="btn btn-primary" onclick="advanceToQA()">Review QA →</button>';
+  } else {
+    renderNC();
+  }
+}
+
+function handleCreativeFiles(input, platform) {
+  const container = document.getElementById('creativeFiles_' + platform.replace(/\s+/g, '_'));
+  if (!container) return;
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  container.innerHTML = files.map(f => `<div style="padding:3px 0">📎 ${f.name} <span style="color:var(--text-muted)">(${(f.size/1024).toFixed(1)} KB)</span></div>`).join('');
+}
+
+/* ── Creative Step: Ad-level taxonomy preview ── */
+function updateCreativeTaxPreview() {
+  const container = document.getElementById('creativeTaxContent');
+  if (!container) return;
+  /* Pull header fields from cached step 1 DOM */
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = ncStep1Cache ? ncStep1Cache.html : '';
+  const getVal = (id) => {
+    const el = tempDiv.querySelector('#' + id);
+    return (el?.getAttribute('value') || el?.value || '').trim();
+  };
+  const adv      = getVal('sf_adv')      || getVal('io_adv')      || '';
+  const mcode    = getVal('sf_mcode')     || getVal('io_mcode')    || '';
+  const name     = getVal('sf_name')      || getVal('io_name')     || '';
+  const projcode = getVal('sf_projcode')  || getVal('io_projcode') || '';
+  const casenum  = getVal('sf_casenum')   || getVal('io_casenum')  || '';
+
+  /* Pull line-item data from cached step 1 */
+  const srcBody = tempDiv.querySelector('#ioLinesBody') || tempDiv.querySelector('#liTableBody');
+  const step1Lines = [];
+  if (srcBody) {
+    Array.from(srcBody.rows).forEach(row => {
+      const sels = row.querySelectorAll('select');
+      const inps = row.querySelectorAll('input');
+      step1Lines.push({
+        platform:  sels[0]?.getAttribute('value') || sels[0]?.value || Array.from(sels[0]?.options||[]).find(o=>o.hasAttribute('selected'))?.value || '',
+        geo:       inps[2]?.getAttribute('value') || inps[2]?.value || '',
+        creative:  sels[1]?.getAttribute('value') || sels[1]?.value || Array.from(sels[1]?.options||[]).find(o=>o.hasAttribute('selected'))?.value || '',
+        goal:      sels[2]?.getAttribute('value') || sels[2]?.value || Array.from(sels[2]?.options||[]).find(o=>o.hasAttribute('selected'))?.value || '',
+        targeting: inps[3]?.getAttribute('value') || inps[3]?.value || ''
+      });
+    });
+  }
+
+  /* Pull creative fields from live step 2 table */
+  const creativeBody = document.getElementById('creativeLinesBody');
+  if (!creativeBody) return;
+  const creativeRows = Array.from(creativeBody.rows);
+
+  const sep = '<span class="tax-sep">#</span>';
+  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
+  const v = (val, label) => val ? val : empty(label);
+
+  let html = '';
+  creativeRows.forEach((row, idx) => {
+    const s1 = step1Lines[idx] || {};
+    const inps = row.querySelectorAll('input');
+    const adName    = inps[0]?.value?.trim() || '';
+    const variation = inps[1]?.value?.trim() || '';
+    const size      = inps[2]?.value?.trim() || '';
+    const copy      = inps[3]?.value?.trim() || '';
+    const platform  = s1.platform || '';
+    const geo       = s1.geo || '';
+    const creative  = s1.creative || '';
+    const goal      = s1.goal || '';
+    const targeting = s1.targeting || '';
+
+    const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
+    const campParts = [v(mcode,'M-Code')];
+    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
+    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
+    const campStr = campParts.join(sep);
+    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    const adStr = adSetStr + sep + v(adName,'Ad Name') + sep + v(variation,'Var') + sep + v(size,'Size/Length') + sep + v(copy,'Copy');
+    html += `
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Ad</div><div class="tax-string">${adStr}</div></div>
+      </div>`;
+  });
+  container.innerHTML = html || '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in Ad Name fields above to see the generated Ad taxonomy…</div>';
+}
+
+const PLATFORM_OPTS = '<option value="">—</option><option>YouTube</option><option>YouTube TV</option><option>CTV</option><option>Meta</option><option>Programmatic</option><option>Google Search</option><option>The Trade Desk</option><option>StackAdapt</option><option>LinkedIn</option><option>X</option>';
+const CREATIVE_OPTS = '<option value="">—</option><option>CTV</option><option>Video</option><option>Display</option><option>Native Display</option><option>Native Video</option><option>Streaming Audio</option>';
+const GOAL_OPTS = '<option value="">—</option><option>Persuasion</option><option>Video Views</option><option>Impressions</option><option>Clicks</option><option>Conversions</option><option>Reach</option><option>Traffic</option><option>Engagement</option>';
+const CAMP_TYPE_OPTS = '<option value="">—</option><option>Awareness</option><option>Conversion</option><option>Engagement</option><option>GOTV</option><option>Page Likes</option><option>Traffic</option><option>Video Views</option><option>Leads</option><option>Reach</option><option>Awareness/GOTV</option>';
+const AD_TYPE_OPTS = '<option value="">—</option><option>CTV</option><option>Display</option><option>Native Display</option><option>Video</option><option>Native Video</option><option>Streaming Audio</option><option>Text</option>';
+
+let liRowCount = 0;
+function lineRowHTML(n) {
+  return `<tr>
+    <td class="row-num">${n}</td>
+    <td><input type="date" onchange="updateTaxPreview()" /></td>
+    <td><input type="date" onchange="updateTaxPreview()" /></td>
+    <td class="fill-cell"><select onchange="updateTaxPreview()">${PLATFORM_OPTS}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><input placeholder="e.g. MI" oninput="updateTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><select onchange="updateTaxPreview()">${CREATIVE_OPTS}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><select onchange="updateTaxPreview()">${GOAL_OPTS}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><input placeholder="e.g. Swing Likely" oninput="updateTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td><input placeholder="$0" style="text-align:right;width:72px" /></td>
+    <td><button class="del-row" onclick="removeLineRow(this)" title="Remove">✕</button></td>
+  </tr>`;
+}
+function seedLineRows(count) {
+  liRowCount = 0;
+  const tbody = document.getElementById('liTableBody');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  for(let i=0;i<count;i++) { liRowCount++; tbody.insertAdjacentHTML('beforeend', lineRowHTML(liRowCount)); }
+}
+function addLineRow() {
+  const tbody = document.getElementById('liTableBody');
+  if(!tbody) return;
+  liRowCount++;
+  tbody.insertAdjacentHTML('beforeend', lineRowHTML(liRowCount));
+}
+function removeLineRow(btn) {
+  const tbody = document.getElementById('liTableBody');
+  if(tbody.rows.length <= 1) return;
+  btn.closest('tr').remove();
+  Array.from(tbody.rows).forEach((r,i) => { r.cells[0].textContent = i+1; });
+  liRowCount = tbody.rows.length;
+  updateTaxPreview();
+}
+
+/* ── Taxonomy live preview builder ── */
+function updateTaxPreview() {
+  const container = document.getElementById('taxPreviewContent');
+  if (!container) return;
+  const adv      = (document.getElementById('sf_adv')?.value      || '').trim();
+  const mcode    = (document.getElementById('sf_mcode')?.value    || '').trim();
+  const name     = (document.getElementById('sf_name')?.value     || '').trim();
+  const projcode = (document.getElementById('sf_projcode')?.value || '').trim();
+  const casenum  = (document.getElementById('sf_casenum')?.value  || '').trim();
+  const tbody = document.getElementById('liTableBody');
+  if (!tbody) return;
+  const rows = Array.from(tbody.rows);
+  if (!adv && !mcode && !name) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div>';
+    return;
+  }
+  const sep = '<span class="tax-sep">#</span>';
+  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
+  const v = (val, label) => val ? val : empty(label);
+
+  let html = '';
+  rows.forEach((row, idx) => {
+    const c = row.cells;
+    const sels = row.querySelectorAll('select');
+    const inps = row.querySelectorAll('input');
+    const platform  = sels[0]?.value || '';
+    const geo       = inps[2]?.value?.trim() || '';
+    const creative  = sels[1]?.value || '';
+    const goal      = sels[2]?.value || '';
+    const targeting = inps[3]?.value?.trim() || '';
+    const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
+    /* Build campaign string — conditionally include Case Number + Project Code after M-Code */
+    const campParts = [v(mcode,'M-Code')];
+    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
+    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
+    const campStr = campParts.join(sep);
+    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    html += `
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+/* ── IO Upload: file handling ── */
+let ioFileName = '';
+let ioLineCount = 0;
+
+function handleIOFile(file) {
+  ioFileName = file.name;
+  const dz = document.getElementById('ioDropZone');
+  dz.innerHTML = `<div class="dz-icon">⏳</div><p style="color:var(--i360-blue);font-weight:500">Parsing ${file.name}…</p><div class="dz-hint">${(file.size/1024).toFixed(1)} KB</div>`;
+  dz.style.borderColor = 'var(--i360-blue)';
+  dz.style.cursor = 'default';
+  dz.style.pointerEvents = 'none';
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    let fullText = '';
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise;
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const tc = await page.getTextContent();
+        fullText += tc.items.map(i => i.str).join(' ') + '\n';
+      }
+    } catch(err) { console.warn('PDF parse failed, falling back to filename', err); }
+
+    /* Show success state */
+    dz.innerHTML = `<div class="dz-icon">✅</div><p style="color:var(--success);font-weight:500">${file.name}</p><div class="dz-hint" style="color:var(--success)">${(file.size/1024).toFixed(1)} KB — parsed</div>`;
+    dz.style.borderColor = 'var(--success)';
+    document.getElementById('ioParsed').style.display = 'block';
+    const btn = document.getElementById('ioNextBtn');
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+
+    /* ---- Parse header fields from PDF text ---- */
+    const t = fullText.replace(/\s+/g,' ');
+
+    /* Helper: extract value after a label, stopping at next known label or end */
+    const labelsList = ['Advertiser:','i360 Campaign Code:','KPI(s):','Campaign Contact:','Project Name:','Project Code:','Case Number:','Start Date','End Date','Platform','Grand Total'];
+    function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    const stopPattern = labelsList.map(l => escRe(l)).join('|');
+    function grab(plainLabel) {
+      const re = new RegExp(escRe(plainLabel) + '\\s*(.+?)(?=' + stopPattern + '|$)', 'i');
+      const m = t.match(re);
+      return m ? m[1].trim() : '';
+    }
+
+    const adv      = grab('Advertiser:');
+    const mcode    = grab('i360 Campaign Code:');
+    const kpi      = grab('KPI(s):');
+    const contact  = grab('Campaign Contact:');
+    const projName = grab('Project Name:');
+    const projCode = grab('Project Code:');
+    const caseNum  = grab('Case Number:');
+
+    /* Fallback: parse M-Code from filename if not found in PDF text */
+    const mcodeFinal = mcode || ((file.name.match(/(M\d{4,7})/i)||[])[1] || '');
+
+    /* ---- Parse line items from PDF text ---- */
+    /* Normalize multi-word platform names that PDF line breaks can split */
+    const tNorm = t
+      .replace(/The\s+Trade\s*\n?\s*Desk/gi, 'TheTradeDesk')
+      .replace(/YouTube\s+TV/gi, 'YouTubeTV')
+      .replace(/Google\s+Search/gi, 'GoogleSearch')
+      .replace(/Native\s+Display/gi, 'NativeDisplay')
+      .replace(/Native\s+Video/gi, 'NativeVideo')
+      .replace(/Streaming\s+Audio/gi, 'StreamingAudio')
+      .replace(/Video\s+Views/gi, 'VideoViews')
+      .replace(/Page\s+Likes/gi, 'PageLikes');
+
+    /* Platform decode map (collapsed → display name) */
+    const platDecode = {TheTradeDesk:'The Trade Desk',YouTubeTV:'YouTube TV',GoogleSearch:'Google Search',YouTube:'YouTube',CTV:'CTV',Meta:'Meta',Programmatic:'Programmatic',StackAdapt:'StackAdapt',LinkedIn:'LinkedIn',X:'X'};
+    const creativeDecode = {NativeDisplay:'Native Display',NativeVideo:'Native Video',StreamingAudio:'Streaming Audio',Display:'Display',Video:'Video',CTV:'CTV',Text:'Text'};
+    const goalDecode = {VideoViews:'Video Views',PageLikes:'Page Likes',Persuasion:'Persuasion',Impressions:'Impressions',Clicks:'Clicks',Conversions:'Conversions',Reach:'Reach',Traffic:'Traffic',Engagement:'Engagement',Leads:'Leads',Awareness:'Awareness'};
+
+    const parsedLines = [];
+    const lineRegex = /(\d{2}\/\d{2}\/\d{2})\s+(\d{2}\/\d{2}\/\d{2})\s+(.+?)\s+\$([0-9,.]+)/g;
+    let sm;
+    while ((sm = lineRegex.exec(tNorm)) !== null) {
+      if (sm[3].includes('Grand Total')) continue;
+      const mid = sm[3].trim();
+
+      /* 1. Detect platform at start of chunk */
+      const platKeys = Object.keys(platDecode);
+      let detPlat = '', rest = mid;
+      for (const p of platKeys) {
+        if (mid.startsWith(p)) { detPlat = platDecode[p]; rest = mid.substring(p.length).trim(); break; }
+      }
+
+      /* 2. If no platform found, chunk starts with geo — try to find platform before the date pair in raw text */
+      if (!detPlat) {
+        const pos = sm.index;
+        const before = tNorm.substring(Math.max(0, pos - 30), pos).trim();
+        for (const p of platKeys) {
+          if (before.endsWith(p)) { detPlat = platDecode[p]; break; }
+        }
+      }
+
+      /* 3. Pull geo (2-letter state) from start of remainder */
+      const stateRe = /^(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC|National)\b/;
+      const geoM = rest.match(stateRe);
+      let detGeo = '', afterGeo = rest;
+      if (geoM) { detGeo = geoM[1]; afterGeo = rest.substring(geoM[0].length).trim(); }
+
+      /* 4. Pull creative type */
+      const creativeKeys = Object.keys(creativeDecode);
+      let detCreative = '';
+      for (const c of creativeKeys) {
+        if (afterGeo.startsWith(c)) { detCreative = creativeDecode[c]; afterGeo = afterGeo.substring(c.length).trim(); break; }
+      }
+
+      /* 5. Pull goal */
+      const goalKeys = Object.keys(goalDecode);
+      let detGoal = '', afterGoal = afterGeo;
+      for (const g of goalKeys) {
+        if (afterGeo.startsWith(g)) { detGoal = goalDecode[g]; afterGoal = afterGeo.substring(g.length).trim(); break; }
+      }
+
+      /* 6. Remaining text is targeting — decode any collapsed tokens back */
+      let targeting = afterGoal;
+
+      parsedLines.push({
+        start: sm[1], end: sm[2], platform: detPlat, geo: detGeo,
+        creative: detCreative, goal: detGoal, targeting: targeting,
+        budget: '$' + sm[4]
+      });
+    }
+
+    /* Convert MM/DD/YY dates to YYYY-MM-DD for date inputs */
+    function toISO(mdy) {
+      const m = mdy.match(/(\d{2})\/(\d{2})\/(\d{2})/);
+      if (!m) return '';
+      const yr = parseInt(m[3]) < 50 ? 2000 + parseInt(m[3]) : 1900 + parseInt(m[3]);
+      return `${yr}-${m[1]}-${m[2]}`;
+    }
+
+    /* Compute total budget from lines */
+    const totalMatch = t.match(/Grand\s*Total\s*\$([0-9,.]+)/i);
+    const totalBudget = totalMatch ? '$' + totalMatch[1] : (parsedLines.length
+      ? '$' + parsedLines.reduce((s,l) => s + parseFloat((l.budget||'').replace(/[^0-9.]/g,'')||0), 0).toLocaleString('en-US',{minimumFractionDigits:2})
+      : '');
+
+    /* Compute overall date range from lines */
+    let startDate = '', endDate = '';
+    if (parsedLines.length) {
+      const starts = parsedLines.map(l => toISO(l.start)).filter(Boolean).sort();
+      const ends = parsedLines.map(l => toISO(l.end)).filter(Boolean).sort();
+      if (starts.length) startDate = starts[0];
+      if (ends.length) endDate = ends[ends.length - 1];
+    }
+
+    /* ---- Populate header fields ---- */
+    document.getElementById('io_adv').value      = adv;
+    document.getElementById('io_mcode').value     = mcodeFinal;
+    document.getElementById('io_kpi').value       = kpi;
+    document.getElementById('io_contact').value   = contact;
+    document.getElementById('io_name').value      = projName;
+    document.getElementById('io_projcode').value  = projCode;
+    document.getElementById('io_casenum').value   = caseNum;
+    document.getElementById('io_budget').value    = totalBudget;
+    if (startDate) document.getElementById('io_start').value = startDate;
+    if (endDate)   document.getElementById('io_end').value   = endDate;
+
+    /* ---- Populate line item rows ---- */
+    const lineCount = Math.max(parsedLines.length, 2);
+    seedIOLineRows(lineCount);
+    const tbody = document.getElementById('ioLinesBody');
+    if (tbody && parsedLines.length) {
+      const rows = Array.from(tbody.rows);
+      parsedLines.forEach((ln, i) => {
+        if (!rows[i]) return;
+        const row = rows[i];
+        /* cells: 0=#, 1=start, 2=end, 3=platform, 4=geo, 5=creative, 6=goal, 7=targeting, 8=budget, 9=del */
+        const setInput = (ci, val) => { const inp = row.cells[ci]?.querySelector('input'); if(inp && val) inp.value = val; };
+        const setSel   = (ci, val) => { const sel = row.cells[ci]?.querySelector('select'); if(sel && val) { sel.value = val; if(!sel.value) sel.value = ''; } };
+        setInput(1, toISO(ln.start));
+        setInput(2, toISO(ln.end));
+        setSel(3, ln.platform);
+        setInput(4, ln.geo);
+        setSel(5, ln.creative);
+        setSel(6, ln.goal);
+        setInput(7, ln.targeting);
+        setInput(8, ln.budget);
+      });
+    }
+
+    document.getElementById('ioLineCountDisplay').textContent = parsedLines.length ? parsedLines.length + ' lines parsed' : '—';
+    document.getElementById('ioParseNote').innerHTML = parsedLines.length
+      ? `Parsed ${parsedLines.length} line items from PDF. Review and edit any values below.`
+      : 'Could not auto-detect line items — enter them manually below.';
+
+    updateIOTaxPreview();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function ioLineRowHTML(n) {
+  return `<tr>
+    <td class="row-num">${n}</td>
+    <td><input type="date" onchange="updateIOTaxPreview()" /></td>
+    <td><input type="date" onchange="updateIOTaxPreview()" /></td>
+    <td class="fill-cell"><select onchange="updateIOTaxPreview()">${PLATFORM_OPTS}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><input placeholder="e.g. MI" oninput="updateIOTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><select onchange="updateIOTaxPreview()">${CREATIVE_OPTS}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><select onchange="updateIOTaxPreview()">${GOAL_OPTS}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><input placeholder="e.g. Swing Likely" oninput="updateIOTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td><input placeholder="$0" style="text-align:right;width:72px" /></td>
+    <td><button class="del-row" onclick="removeIOLineRow(this)" title="Remove">✕</button></td>
+  </tr>`;
+}
+
+function seedIOLineRows(count) {
+  ioLineCount = 0;
+  const tbody = document.getElementById('ioLinesBody');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  for(let i=0;i<count;i++) { ioLineCount++; tbody.insertAdjacentHTML('beforeend', ioLineRowHTML(ioLineCount)); }
+}
+function addIOLineRow() {
+  const tbody = document.getElementById('ioLinesBody');
+  if(!tbody) return;
+  ioLineCount++;
+  tbody.insertAdjacentHTML('beforeend', ioLineRowHTML(ioLineCount));
+}
+function removeIOLineRow(btn) {
+  const tbody = document.getElementById('ioLinesBody');
+  if(tbody.rows.length <= 1) return;
+  btn.closest('tr').remove();
+  Array.from(tbody.rows).forEach((r,i) => { r.cells[0].textContent = i+1; });
+  ioLineCount = tbody.rows.length;
+  updateIOTaxPreview();
+}
+
+function updateIOTaxPreview() {
+  const container = document.getElementById('ioTaxContent');
+  if (!container) return;
+  const adv      = (document.getElementById('io_adv')?.value      || '').trim();
+  const mcode    = (document.getElementById('io_mcode')?.value    || '').trim();
+  const name     = (document.getElementById('io_name')?.value     || '').trim();
+  const projcode = (document.getElementById('io_projcode')?.value || '').trim();
+  const casenum  = (document.getElementById('io_casenum')?.value  || '').trim();
+  const tbody = document.getElementById('ioLinesBody');
+  if (!tbody) return;
+  const rows = Array.from(tbody.rows);
+  if (!adv && !mcode && !name) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div>';
+    return;
+  }
+  const sep = '<span class="tax-sep">#</span>';
+  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
+  const v = (val, label) => val ? val : empty(label);
+  let html = '';
+  rows.forEach((row, idx) => {
+    const sels = row.querySelectorAll('select');
+    const inps = row.querySelectorAll('input');
+    const platform  = sels[0]?.value || '';
+    const geo       = inps[2]?.value?.trim() || '';
+    const creative  = sels[1]?.value || '';
+    const goal      = sels[2]?.value || '';
+    const targeting = inps[3]?.value?.trim() || '';
+    const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
+    const campParts = [v(mcode,'M-Code')];
+    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
+    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
+    const campStr = campParts.join(sep);
+    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    html += `
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+/* ── Run QA Modal ── */
+const VALID_CAMP_TYPES = ['Awareness','Conversion','Engagement','GOTV','Page Likes','Traffic','Video Views','Leads','Reach','Awareness/GOTV'];
+const VALID_AD_TYPES = ['CTV','Display','Native Display','Video','Native Video','Streaming Audio','Text'];
+const VALID_PLATFORMS = ['YouTube','YouTube TV','CTV','Meta','Programmatic','Google Search','The Trade Desk','StackAdapt','LinkedIn','X'];
+const VALID_CREATIVES = ['CTV','Video','Display','Native Display','Native Video','Streaming Audio'];
+const VALID_GOALS = ['Persuasion','Video Views','Impressions','Clicks','Conversions','Reach','Traffic','Engagement'];
+
+function runQA(id) {
+  const c = campaigns.find(x => x.id === id);
+  if (!c) return;
+
+  const checks = [];
+  let passCount = 0;
+  let warnCount = 0;
+  let failCount = 0;
+
+  function addCheck(label, status, detail) {
+    checks.push({ label, status, detail });
+    if (status === 'pass') passCount++;
+    else if (status === 'warn') warnCount++;
+    else failCount++;
+  }
+
+  /* ── Header field checks ── */
+  const nameOk = c.mcode && c.advertiser && c.name;
+  const taxLabel = [c.mcode, c.advertiser, c.name].filter(Boolean).join('#');
+  addCheck('Campaign naming convention', nameOk ? 'pass' : 'fail',
+    nameOk ? 'Taxonomy root: ' + taxLabel : 'Missing fields — need M-Code (' + (c.mcode||'empty') + '), Advertiser (' + (c.advertiser||'empty') + '), Name (' + (c.name||'empty') + ')');
+
+  addCheck('M-Code format', /^M\d{4,7}$/i.test(c.mcode) ? 'pass' : 'warn',
+    /^M\d{4,7}$/i.test(c.mcode) ? c.mcode + ' matches M+digits pattern' : '"' + (c.mcode||'') + '" — expected format M followed by 4-7 digits');
+
+  addCheck('Project Code', c.projcode ? 'pass' : 'warn',
+    c.projcode ? 'Project Code: ' + c.projcode : 'No Project Code assigned — may be required for billing');
+
+  addCheck('Case Number', c.casenum ? 'pass' : 'warn',
+    c.casenum ? 'Case Number: ' + c.casenum : 'No Case Number assigned — may be required for tracking');
+
+  addCheck('Campaign Contact', c.contact ? 'pass' : 'warn',
+    c.contact ? 'Contact: ' + c.contact : 'No campaign contact specified');
+
+  addCheck('KPI(s)', c.kpi ? 'pass' : 'warn',
+    c.kpi ? 'KPI: ' + c.kpi : 'No KPI defined — needed for optimization strategy');
+
+  /* ── Line item checks ── */
+  const lineCount = c.lines.length;
+  addCheck('Line items present', lineCount > 0 ? 'pass' : 'fail',
+    lineCount > 0 ? lineCount + ' line item' + (lineCount !== 1 ? 's' : '') + ' defined' : 'No line items — campaign has nothing to launch');
+
+  /* Platforms */
+  const platforms = [...new Set(c.lines.map(l => l.platform).filter(Boolean))];
+  const invalidPlats = platforms.filter(p => !VALID_PLATFORMS.includes(p));
+  addCheck('Platform coverage', platforms.length > 0 ? (invalidPlats.length ? 'warn' : 'pass') : 'fail',
+    platforms.length > 0
+      ? platforms.join(', ') + (invalidPlats.length ? ' — unrecognized: ' + invalidPlats.join(', ') : ' — all recognized')
+      : 'No platforms selected on any line item');
+
+  /* Geo */
+  const geos = [...new Set(c.lines.map(l => l.geo).filter(Boolean))];
+  addCheck('Geo targeting', geos.length > 0 ? 'pass' : 'warn',
+    geos.length > 0 ? geos.join(', ') + ' across ' + lineCount + ' line items' : 'No geo specified — lines may default to national');
+
+  /* Budget */
+  let totalBudget = 0;
+  let linesWithBudget = 0;
+  let linesNoBudget = 0;
+  c.lines.forEach(l => {
+    const val = parseFloat((l.budget || '').replace(/[^0-9.]/g, '')) || 0;
+    totalBudget += val;
+    if (val > 0) linesWithBudget++;
+    else linesNoBudget++;
+  });
+  const budgetStr = '$' + totalBudget.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  addCheck('Budget totals', totalBudget > 0 ? (linesNoBudget > 0 ? 'warn' : 'pass') : 'fail',
+    totalBudget > 0
+      ? budgetStr + ' total across ' + linesWithBudget + ' lines' + (linesNoBudget > 0 ? ' — ' + linesNoBudget + ' line(s) have $0' : '')
+      : 'No budget entered on any line item');
+
+  /* Flight dates */
+  const starts = c.lines.map(l => l.start).filter(Boolean);
+  const ends = c.lines.map(l => l.end).filter(Boolean);
+  const hasDates = starts.length > 0 && ends.length > 0;
+  let dateIssues = [];
+  c.lines.forEach((l, i) => {
+    if (l.start && l.end && l.start > l.end) dateIssues.push('Line ' + (i + 1) + ': start after end');
+    if (!l.start || !l.end) dateIssues.push('Line ' + (i + 1) + ': missing date');
+  });
+  addCheck('Flight dates', hasDates ? (dateIssues.length ? 'warn' : 'pass') : 'warn',
+    hasDates
+      ? (dateIssues.length ? dateIssues.join('; ') : 'All lines have valid date ranges')
+      : 'Some or all lines missing flight dates');
+
+  /* Goal validation (campaign level) */
+  const goals = c.lines.map(l => l.goal).filter(Boolean);
+  const invalidGoals = goals.filter(g => !VALID_GOALS.includes(g));
+  const missingGoals = c.lines.filter(l => !l.goal).length;
+  addCheck('Goal values (campaign level)', goals.length > 0 && invalidGoals.length === 0 ? (missingGoals > 0 ? 'warn' : 'pass') : (goals.length === 0 ? 'warn' : 'fail'),
+    goals.length > 0
+      ? [...new Set(goals)].join(', ') + (invalidGoals.length ? ' — INVALID: ' + invalidGoals.join(', ') : '') + (missingGoals > 0 ? ' — ' + missingGoals + ' line(s) blank' : '')
+      : 'No Goal set on any line');
+
+  /* Creative type (ad set level) */
+  const creatives = c.lines.map(l => l.creative).filter(Boolean);
+  const invalidCR = creatives.filter(t => !VALID_CREATIVES.includes(t));
+  const missingCR = c.lines.filter(l => !l.creative).length;
+  addCheck('Creative type (ad set level)', creatives.length > 0 ? (invalidCR.length ? 'warn' : (missingCR > 0 ? 'warn' : 'pass')) : 'warn',
+    creatives.length > 0
+      ? [...new Set(creatives)].join(', ') + (invalidCR.length ? ' — unrecognized: ' + invalidCR.join(', ') : '') + (missingCR > 0 ? ' — ' + missingCR + ' line(s) blank' : '')
+      : 'No creative type set — non-blocking');
+
+  /* Targeting */
+  const targeting = c.lines.map(l => l.targeting).filter(Boolean);
+  addCheck('Targeting defined', targeting.length > 0 ? 'pass' : 'warn',
+    targeting.length > 0 ? [...new Set(targeting)].join(', ') : 'No targeting specified — may default to broad');
+
+  /* Ad Name / Variation / Copy completeness for taxonomy */
+  const taxComplete = c.lines.filter(l => l.adName && l.variation && l.copy).length;
+  const taxIncomplete = lineCount - taxComplete;
+  addCheck('Taxonomy completeness (Ad level)', taxComplete === lineCount ? 'pass' : 'warn',
+    taxComplete === lineCount
+      ? 'All ' + lineCount + ' lines have Ad Name, Variation, and Copy set'
+      : taxIncomplete + ' of ' + lineCount + ' lines missing Ad Name, Variation, or Copy — taxonomy will have blanks');
+
+  /* Creative assets (always warn for wireframe) */
+  addCheck('Creative assets uploaded', 'warn', 'Creative upload is in the next step — depends on platform & channel');
+
+  /* Tracking */
+  addCheck('Tracking setup', 'pass', 'i360 pixel template ready for deployment');
+
+  /* ── Determine overall result ── */
+  const overallStatus = failCount > 0 ? 'fail' : (warnCount > 0 ? 'warn' : 'pass');
+
+  /* Persist result to campaign */
+  c.qa = overallStatus === 'fail' ? 'fail' : (overallStatus === 'pass' ? 'pass' : 'warn');
+  c.qaChecks = checks;
+  c.qaTimestamp = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+  /* ── Render ── */
+  const title = document.getElementById('qaTitle');
+  const body = document.getElementById('qaBody');
+  const footer = document.getElementById('qaFooter');
+  title.textContent = 'QA Review — ' + c.mcode;
+
+  const statusColor = overallStatus === 'pass' ? 'var(--success)' : overallStatus === 'fail' ? 'var(--i360-red)' : 'var(--i360-gold)';
+  const statusIcon = overallStatus === 'pass' ? '✅' : overallStatus === 'fail' ? '❌' : '⚠️';
+  const statusText = overallStatus === 'pass' ? 'All Checks Passed' : overallStatus === 'fail' ? 'Issues Found' : 'Warnings';
+
+  let checklistHTML = checks.map(ch => {
+    const icon = ch.status === 'pass' ? '✓' : ch.status === 'fail' ? '✕' : '!';
+    const iconClass = ch.status === 'pass' ? 'check-pass' : ch.status === 'fail' ? 'check-fail' : 'check-warn';
+    const detailStyle = ch.status !== 'pass' ? ` style="color:${ch.status === 'fail' ? 'var(--i360-red)' : 'var(--i360-gold)'}"` : '';
+    return `<li><span class="check-icon ${iconClass}">${icon}</span><div><div class="check-text">${ch.label}</div><div class="check-detail"${detailStyle}>${ch.detail}</div></div></li>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:10px;margin-bottom:20px;background:${overallStatus==='pass'?'rgba(16,185,129,0.08)':overallStatus==='fail'?'rgba(220,88,42,0.08)':'rgba(240,179,35,0.08)'};border:1px solid ${overallStatus==='pass'?'rgba(16,185,129,0.2)':overallStatus==='fail'?'rgba(220,88,42,0.2)':'rgba(240,179,35,0.2)'}">
+      <span style="font-size:28px">${statusIcon}</span>
+      <div>
+        <div style="font-weight:700;font-size:15px;color:${statusColor}">${statusText}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${passCount} passed · ${warnCount} warning${warnCount!==1?'s':''} · ${failCount} failed — ${c.mcode} ${c.name}</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Ran ${c.qaTimestamp} · Checks validated against saved IO data</div>
+    <ul class="checklist">${checklistHTML}</ul>
+  `;
+
+  footer.innerHTML = `
+    <button class="btn btn-ghost" onclick="closeQA()">Close</button>
+    <button class="btn btn-ghost" onclick="closeQA();editIO(${c.id})">Edit IO</button>
+    ${overallStatus==='pass' && (c.status==='draft'||c.status==='scheduled') ? '<button class="btn btn-primary">Launch Campaign</button>' : ''}
+  `;
+
+  document.getElementById('qaModal').classList.add('show');
+
+  /* Refresh the detail page behind the modal so banner updates */
+  openDetail(c.id);
+}
+
+function closeQA() {
+  document.getElementById('qaModal').classList.remove('show');
+}
+
+/* ── Edit IO Modal ── */
+let editIOCampaignId = null;
+let editIORowCount = 0;
+
+function editIO(id) {
+  editIOCampaignId = id;
+  renderEditIO();
+  document.getElementById('editIOModal').classList.add('show');
+}
+function closeEditIO() {
+  document.getElementById('editIOModal').classList.remove('show');
+  editIOCampaignId = null;
+}
+
+function editIOLineRow(n, lineData) {
+  const d = lineData || {};
+  function selOpts(optsHTML, selected) {
+    if (!selected) return optsHTML;
+    return optsHTML.replace(`<option>${selected}</option>`, `<option selected>${selected}</option>`);
+  }
+  return `<tr>
+    <td class="row-num">${n}</td>
+    <td><input type="date" value="${d.start||''}" onchange="updateEditIOTaxPreview()" /></td>
+    <td><input type="date" value="${d.end||''}" onchange="updateEditIOTaxPreview()" /></td>
+    <td class="fill-cell"><select onchange="updateEditIOTaxPreview()">${selOpts(PLATFORM_OPTS, d.platform)}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><input value="${d.geo||''}" placeholder="e.g. MI" oninput="updateEditIOTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><select onchange="updateEditIOTaxPreview()">${selOpts(CREATIVE_OPTS, d.creative)}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><select onchange="updateEditIOTaxPreview()">${selOpts(GOAL_OPTS, d.goal)}</select><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td class="fill-cell"><input value="${d.targeting||''}" placeholder="e.g. Swing Likely" oninput="updateEditIOTaxPreview()" /><div class="fill-handle" onmousedown="startFill(event)"></div></td>
+    <td><input value="${d.budget||''}" placeholder="$0" style="text-align:right;width:72px" /></td>
+    <td><button class="del-row" onclick="removeEditIORow(this)" title="Remove">✕</button></td>
+  </tr>`;
+}
+
+function addEditIORow() {
+  const tbody = document.getElementById('editIOLinesBody');
+  if(!tbody) return;
+  editIORowCount++;
+  tbody.insertAdjacentHTML('beforeend', editIOLineRow(editIORowCount));
+}
+function removeEditIORow(btn) {
+  const tbody = document.getElementById('editIOLinesBody');
+  if(tbody.rows.length <= 1) return;
+  btn.closest('tr').remove();
+  Array.from(tbody.rows).forEach((r,i) => { r.cells[0].textContent = i+1; });
+  editIORowCount = tbody.rows.length;
+  updateEditIOTaxPreview();
+}
+
+function updateEditIOTaxPreview() {
+  const container = document.getElementById('editIOTaxContent');
+  if (!container) return;
+  const adv      = (document.getElementById('eio_adv')?.value      || '').trim();
+  const mcode    = (document.getElementById('eio_mcode')?.value    || '').trim();
+  const name     = (document.getElementById('eio_name')?.value     || '').trim();
+  const projcode = (document.getElementById('eio_projcode')?.value || '').trim();
+  const casenum  = (document.getElementById('eio_casenum')?.value  || '').trim();
+  const tbody = document.getElementById('editIOLinesBody');
+  if (!tbody) return;
+  const rows = Array.from(tbody.rows);
+  if (!adv && !mcode && !name) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div>';
+    return;
+  }
+  const sep = '<span class="tax-sep">#</span>';
+  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
+  const v = (val, label) => val ? val : empty(label);
+  let html = '';
+  rows.forEach((row, idx) => {
+    const sels = row.querySelectorAll('select');
+    const inps = row.querySelectorAll('input');
+    const platform  = sels[0]?.value || '';
+    const geo       = inps[2]?.value?.trim() || '';
+    const creative  = sels[1]?.value || '';
+    const goal      = sels[2]?.value || '';
+    const targeting = inps[3]?.value?.trim() || '';
+    const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
+    const campParts = [v(mcode,'M-Code')];
+    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
+    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
+    const campStr = campParts.join(sep);
+    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    html += `
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderEditIO() {
+  const c = campaigns.find(x => x.id === editIOCampaignId);
+  if (!c) return;
+  const body = document.getElementById('editIOBody');
+  const footer = document.getElementById('editIOFooter');
+  const title = document.getElementById('editIOTitle');
+  title.textContent = `Edit IO — ${c.mcode}`;
+
+  /* Compute total budget from lines */
+  const totalBudget = c.lines.reduce((s, l) => {
+    const val = (l.budget||'').replace(/[^0-9.]/g,'');
+    return s + (parseFloat(val)||0);
+  }, 0);
+  const budgetStr = totalBudget > 0 ? '$' + totalBudget.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
+
+  /* Compute flight dates from lines */
+  const starts = c.lines.map(l=>l.start).filter(Boolean).sort();
+  const ends = c.lines.map(l=>l.end).filter(Boolean).sort();
+  const flightStart = starts[0] || '';
+  const flightEnd = ends[ends.length-1] || '';
+
+  body.innerHTML = `
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px;font-style:italic">Edit campaign IO fields and line items. Changes save to your local session only (Demo Mode).</div>
+    <div class="io-field-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div class="io-field"><div class="io-field-label">Advertiser</div><div class="io-field-val"><input class="form-input" id="eio_adv" value="${c.advertiser||''}" style="padding:5px 8px;font-size:12px" oninput="updateEditIOTaxPreview()" /></div></div>
+      <div class="io-field"><div class="io-field-label">i360 Campaign Code</div><div class="io-field-val"><input class="form-input" id="eio_mcode" value="${c.mcode||''}" style="padding:5px 8px;font-size:12px" oninput="updateEditIOTaxPreview()" /></div></div>
+      <div class="io-field"><div class="io-field-label">KPI(s)</div><div class="io-field-val"><input class="form-input" id="eio_kpi" value="${c.kpi||''}" style="padding:5px 8px;font-size:12px" /></div></div>
+      <div class="io-field"><div class="io-field-label">Campaign Contact</div><div class="io-field-val"><input class="form-input" id="eio_contact" value="${c.contact||''}" style="padding:5px 8px;font-size:12px" /></div></div>
+      <div class="io-field" style="grid-column:span 2"><div class="io-field-label">Project Name</div><div class="io-field-val"><input class="form-input" id="eio_name" value="${c.name||''}" style="padding:5px 8px;font-size:12px" oninput="updateEditIOTaxPreview()" /></div></div>
+      <div class="io-field"><div class="io-field-label">Project Code</div><div class="io-field-val"><input class="form-input" id="eio_projcode" value="${c.projcode||''}" style="padding:5px 8px;font-size:12px" oninput="updateEditIOTaxPreview()" /></div></div>
+      <div class="io-field"><div class="io-field-label">Case Number</div><div class="io-field-val"><input class="form-input" id="eio_casenum" value="${c.casenum||''}" style="padding:5px 8px;font-size:12px" oninput="updateEditIOTaxPreview()" /></div></div>
+      <div class="io-field"><div class="io-field-label">Flight Start</div><div class="io-field-val"><input type="date" class="form-input" id="eio_start" value="${flightStart}" style="padding:5px 8px;font-size:12px" /></div></div>
+      <div class="io-field"><div class="io-field-label">Flight End</div><div class="io-field-val"><input type="date" class="form-input" id="eio_end" value="${flightEnd}" style="padding:5px 8px;font-size:12px" /></div></div>
+      <div class="io-field"><div class="io-field-label">Total Budget</div><div class="io-field-val"><input class="form-input" id="eio_budget" value="${budgetStr}" style="padding:5px 8px;font-size:12px" readonly /></div></div>
+      <div class="io-field"><div class="io-field-label">Line Items</div><div class="io-field-val" style="font-weight:600;font-size:12px;padding:6px 0" id="editIOLineCountDisplay">${c.lines.length}</div></div>
+    </div>
+    <div class="section-title" style="font-size:12px;margin-bottom:6px;margin-top:12px">Line Items</div>
+    <div class="li-table-wrap" style="overflow-x:auto">
+      <table class="li-table" style="min-width:1440px">
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>Start</th><th>End</th><th>Platform</th><th>Geo</th><th>Creative</th><th>Goal</th>
+            <th>Targeting</th><th>Budget</th><th style="width:28px"></th>
+          </tr>
+        </thead>
+        <tbody id="editIOLinesBody"></tbody>
+      </table>
+    </div>
+    <button class="add-line-btn" style="margin-top:8px" onclick="addEditIORow()">+ Add Line Item</button>
+    <div class="tax-preview" style="margin-top:14px">
+      <div class="tax-preview-header"><h4>Generated Taxonomy</h4><div class="tax-badge">Live</div></div>
+      <div id="editIOTaxContent"><div style="font-size:12px;color:var(--text-muted);font-style:italic">Taxonomy preview…</div></div>
+    </div>
+  `;
+
+  /* Seed line rows from campaign data */
+  editIORowCount = 0;
+  const tbody = document.getElementById('editIOLinesBody');
+  c.lines.forEach(l => {
+    editIORowCount++;
+    tbody.insertAdjacentHTML('beforeend', editIOLineRow(editIORowCount, l));
+  });
+
+  updateEditIOTaxPreview();
+
+  footer.innerHTML = `
+    <button class="btn btn-ghost" onclick="closeEditIO()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveIO()">Save Changes</button>
+  `;
+}
+
+function saveIO() {
+  const c = campaigns.find(x => x.id === editIOCampaignId);
+  if (!c) return;
+
+  /* Save header fields */
+  c.name = (document.getElementById('eio_name')?.value||'').trim();
+  c.mcode = (document.getElementById('eio_mcode')?.value||'').trim();
+  c.advertiser = (document.getElementById('eio_adv')?.value||'').trim();
+  c.kpi = (document.getElementById('eio_kpi')?.value||'').trim();
+  c.contact = (document.getElementById('eio_contact')?.value||'').trim();
+  c.projcode = (document.getElementById('eio_projcode')?.value||'').trim();
+  c.casenum = (document.getElementById('eio_casenum')?.value||'').trim();
+
+  /* Save line items */
+  const tbody = document.getElementById('editIOLinesBody');
+  const newLines = [];
+  const platformSet = {};
+  let totalBudget = 0;
+  const allGeos = [];
+  const allStarts = [];
+  const allEnds = [];
+
+  Array.from(tbody.rows).forEach(r => {
+    const inps = r.querySelectorAll('input');
+    const sels = r.querySelectorAll('select');
+    const line = {
+      start: inps[0]?.value||'',
+      end: inps[1]?.value||'',
+      platform: sels[0]?.value||'',
+      geo: inps[2]?.value?.trim()||'',
+      creative: sels[1]?.value||'',
+      goal: sels[2]?.value||'',
+      targeting: inps[3]?.value?.trim()||'',
+      budget: inps[4]?.value?.trim()||''
+    };
+    newLines.push(line);
+
+    if(line.platform) {
+      const platKeyMap = {'YouTube':'youtube','YouTube TV':'youtubetv','CTV':'ctv','Meta':'meta','Programmatic':'programmatic','Google Search':'search','The Trade Desk':'ttd','StackAdapt':'sa','LinkedIn':'linkedin','X':'x'};
+      platformSet[line.platform] = platKeyMap[line.platform] || line.platform.toLowerCase().replace(/\s+/g,'');
+    }
+    if(line.geo && !allGeos.includes(line.geo)) allGeos.push(line.geo);
+    if(line.start) allStarts.push(line.start);
+    if(line.end) allEnds.push(line.end);
+    const budVal = (line.budget||'').replace(/[^0-9.]/g,'');
+    totalBudget += parseFloat(budVal)||0;
+  });
+
+  c.lines = newLines;
+
+  /* Update derived fields */
+  c.platforms = Object.entries(platformSet).map(([label, key]) => ({key, label}));
+  c.budget = totalBudget > 0 ? '$' + totalBudget.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
+
+  /* Update dates display */
+  allStarts.sort(); allEnds.sort();
+  if(allStarts.length && allEnds.length) {
+    const fmt = (d) => { const dt=new Date(d+'T12:00:00'); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}); };
+    c.dates = fmt(allStarts[0]) + ' – ' + fmt(allEnds[allEnds.length-1]);
+  }
+
+  /* Close modal and refresh */
+  closeEditIO();
+  renderTable();
+  openDetail(c.id);
+}
+
+/* ── Collect form data for QA + Summary steps ── */
+function collectFormData() {
+  /* Pull header fields from step 1 cache (they may not be in current DOM if we're on step 2+) */
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = ncStep1Cache ? ncStep1Cache.html : document.getElementById('ncBody')?.innerHTML || '';
+  const adv = (tempDiv.querySelector('#io_adv')?.getAttribute('value') || tempDiv.querySelector('#sf_adv')?.getAttribute('value') || '').trim();
+  const mcode = (tempDiv.querySelector('#io_mcode')?.getAttribute('value') || tempDiv.querySelector('#sf_mcode')?.getAttribute('value') || '').trim();
+  const name = (tempDiv.querySelector('#io_name')?.getAttribute('value') || tempDiv.querySelector('#sf_name')?.getAttribute('value') || '').trim();
+  /* Count line items from whichever cached table is present */
+  const tbody = tempDiv.querySelector('#ioLinesBody') || tempDiv.querySelector('#liTableBody');
+  let lineCount = 0;
+  let platforms = [];
+  let totalBudget = 0;
+  let geos = [];
+  if(tbody) {
+    const rows = Array.from(tbody.rows);
+    lineCount = rows.length;
+    rows.forEach(r => {
+      const sels = r.querySelectorAll('select');
+      const inps = r.querySelectorAll('input');
+      /* For baked values, check selected attribute on options */
+      const platSel = sels[0];
+      const plat = platSel ? (Array.from(platSel.options).find(o=>o.hasAttribute('selected'))?.value || platSel.value || '') : '';
+      if(plat && !platforms.includes(plat)) platforms.push(plat);
+      const geoVal = inps[2]?.getAttribute('value')?.trim() || '';
+      if(geoVal && !geos.includes(geoVal)) geos.push(geoVal);
+      const budgetStr = (inps[inps.length-1]?.getAttribute('value') || '').replace(/[^0-9.]/g,'') || '0';
+      totalBudget += parseFloat(budgetStr) || 0;
+    });
+  }
+  /* Pull creative line data from step 2 (current DOM if on step 2, or step2 cache) */
+  let creativeLines = [];
+  const creativeBody = document.getElementById('creativeLinesBody');
+  if (creativeBody) {
+    Array.from(creativeBody.rows).forEach(r => {
+      const inps = r.querySelectorAll('input');
+      creativeLines.push({
+        adName: inps[0]?.value?.trim() || '',
+        variation: inps[1]?.value?.trim() || '',
+        size: inps[2]?.value?.trim() || '',
+        copy: inps[3]?.value?.trim() || ''
+      });
+    });
+  } else if (ncStep2Cache) {
+    const tmpDiv2 = document.createElement('div');
+    tmpDiv2.innerHTML = ncStep2Cache.html;
+    const cachedBody = tmpDiv2.querySelector('#creativeLinesBody');
+    if (cachedBody) {
+      Array.from(cachedBody.rows).forEach(r => {
+        const inps = r.querySelectorAll('input');
+        creativeLines.push({
+          adName: inps[0]?.getAttribute('value')?.trim() || '',
+          variation: inps[1]?.getAttribute('value')?.trim() || '',
+          size: inps[2]?.getAttribute('value')?.trim() || '',
+          copy: inps[3]?.getAttribute('value')?.trim() || ''
+        });
+      });
+    }
+  }
+  return { adv, mcode, name, lineCount, platforms, totalBudget, geos, creativeLines };
+}
+
+/* ============================================================
+   DRAG-TO-FILL — copies cell value down through rows on drag
+   Works for inputs and selects in .fill-cell columns
+   ============================================================ */
+let fillState = null;
+
+function startFill(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const handle = e.target;
+  const srcCell = handle.closest('td');
+  const srcRow  = srcCell.closest('tr');
+  const tbody   = srcRow.closest('tbody');
+  if (!srcCell || !srcRow || !tbody) return;
+
+  const colIdx  = srcCell.cellIndex;
+  const rowIdx  = Array.from(tbody.rows).indexOf(srcRow);
+
+  /* Get source value */
+  const srcInput  = srcCell.querySelector('input');
+  const srcSelect = srcCell.querySelector('select');
+  const srcVal    = srcInput ? srcInput.value : (srcSelect ? srcSelect.value : '');
+
+  fillState = { tbody, colIdx, startRow: rowIdx, srcVal, lastRow: rowIdx, highlighted: [] };
+  srcCell.classList.add('fill-active');
+
+  document.addEventListener('mousemove', onFillMove);
+  document.addEventListener('mouseup', onFillEnd);
+}
+
+function onFillMove(e) {
+  if (!fillState) return;
+  const { tbody, colIdx, startRow, highlighted } = fillState;
+
+  /* Find which row the mouse is over */
+  const rows = Array.from(tbody.rows);
+  let targetRow = -1;
+  for (let i = 0; i < rows.length; i++) {
+    const rect = rows[i].getBoundingClientRect();
+    if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+      targetRow = i;
+      break;
+    }
+  }
+  if (targetRow < 0) return;
+
+  /* Clear old highlights */
+  highlighted.forEach(cell => cell.classList.remove('fill-highlight'));
+  fillState.highlighted = [];
+
+  /* Highlight from startRow+1 to targetRow (only downward) */
+  const from = startRow + 1;
+  const to   = Math.max(targetRow, startRow);
+  for (let r = from; r <= to; r++) {
+    if (!rows[r]) continue;
+    const cell = rows[r].cells[colIdx];
+    if (cell) {
+      cell.classList.add('fill-highlight');
+      fillState.highlighted.push(cell);
+    }
+  }
+  fillState.lastRow = to;
+}
+
+function onFillEnd(e) {
+  if (!fillState) return;
+  const { tbody, colIdx, startRow, lastRow, srcVal, highlighted } = fillState;
+  const rows = Array.from(tbody.rows);
+
+  /* Apply value to all rows from startRow+1 to lastRow */
+  for (let r = startRow + 1; r <= lastRow; r++) {
+    if (!rows[r]) continue;
+    const cell = rows[r].cells[colIdx];
+    if (!cell) continue;
+    const inp = cell.querySelector('input');
+    const sel = cell.querySelector('select');
+    if (inp)  inp.value = srcVal;
+    if (sel)  sel.value = srcVal;
+  }
+
+  /* Clean up highlights */
+  highlighted.forEach(cell => cell.classList.remove('fill-highlight'));
+  /* Remove fill-active from source cell */
+  const srcCell = rows[startRow]?.cells[colIdx];
+  if (srcCell) srcCell.classList.remove('fill-active');
+
+  fillState = null;
+  document.removeEventListener('mousemove', onFillMove);
+  document.removeEventListener('mouseup', onFillEnd);
+
+  /* Trigger taxonomy preview update — find whichever one is active */
+  if (typeof updateTaxPreview === 'function') updateTaxPreview();
+  if (typeof updateIOTaxPreview === 'function') updateIOTaxPreview();
+  if (typeof updateEditIOTaxPreview === 'function') updateEditIOTaxPreview();
+  if (typeof updateCreativeTaxPreview === 'function') updateCreativeTaxPreview();
+}
+</script>
+</body>
+</html>
