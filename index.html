@@ -911,7 +911,11 @@ function showValidationError(v) {
 
 function bakeFormValues() {
   const body = document.getElementById('ncBody');
-  body.querySelectorAll('input, textarea').forEach(el => { el.setAttribute('value', el.value); });
+  body.querySelectorAll('input, textarea').forEach(el => {
+    el.setAttribute('value', el.value);
+    /* Preserve tax-edited class so cached DOM retains manual edits */
+    if (el.classList.contains('tax-edited')) el.setAttribute('class', el.className);
+  });
   body.querySelectorAll('select').forEach(sel => {
     Array.from(sel.options).forEach(opt => {
       if (opt.selected) opt.setAttribute('selected', 'selected');
@@ -1060,20 +1064,32 @@ function updateCreativeTaxPreview() {
 
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
     const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
-    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
-    const adStr    = adSetStr + '#' + (adName||'[Ad Name]') + '#' + (variation||'[Var]') + '#' + (size||'[Size/Length]') + '#' + (copy||'[Copy]');
+    /* Inherit manual edits from step 1 IO/scratch taxonomy inputs */
+    const s1Camp  = tempDiv.querySelector('#io_tax_camp_'+idx)  || tempDiv.querySelector('#sf_tax_camp_'+idx);
+    const s1AdSet = tempDiv.querySelector('#io_tax_adset_'+idx) || tempDiv.querySelector('#sf_tax_adset_'+idx);
+    const s1CampEdited  = s1Camp  && s1Camp.classList.contains('tax-edited');
+    const s1AdSetEdited = s1AdSet && s1AdSet.classList.contains('tax-edited');
+    /* Resolve effective campaign & adset, cascading step-1 edits into ad-level */
     const existCamp  = container.querySelector('#cr_tax_camp_'+idx);
     const existAdSet = container.querySelector('#cr_tax_adset_'+idx);
     const existAd    = container.querySelector('#cr_tax_ad_'+idx);
-    const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))   ? existCamp.value  : campStr;
-    const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
-    const adVal    = (existAd && existAd.classList.contains('tax-edited'))       ? existAd.value    : adStr;
+    const effectiveCamp = (existCamp && existCamp.classList.contains('tax-edited')) ? existCamp.value : (s1CampEdited ? (s1Camp.getAttribute('value')||s1Camp.value) : campStr);
+    const adSetStr = effectiveCamp + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
+    const effectiveAdSet = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : (s1AdSetEdited ? (s1AdSet.getAttribute('value')||s1AdSet.value) : adSetStr);
+    const adStr    = effectiveAdSet + '#' + (adName||'[Ad Name]') + '#' + (variation||'[Var]') + '#' + (size||'[Size/Length]') + '#' + (copy||'[Copy]');
+    const campVal  = effectiveCamp;
+    const adSetVal = effectiveAdSet;
+    const adVal    = (existAd && existAd.classList.contains('tax-edited')) ? existAd.value : adStr;
+    /* Determine highlight: any parent edit should cascade gold border to all children */
+    const campEdited  = s1CampEdited || (existCamp && existCamp.classList.contains('tax-edited')) || campVal !== campStr;
+    const adSetEdited = campEdited || s1AdSetEdited || (existAdSet && existAdSet.classList.contains('tax-edited'));
+    const adEdited    = adSetEdited || (existAd && existAd.classList.contains('tax-edited')) || adVal !== adStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="cr_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="cr_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
-        <div class="tax-level"><div class="tax-level-label">Ad</div><input class="tax-input${adVal!==adStr?' tax-edited':''}" id="cr_tax_ad_${idx}" value="${adVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campEdited?' tax-edited':''}" id="cr_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateCampEdit(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetEdited?' tax-edited':''}" id="cr_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateAdSetEdit(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad</div><input class="tax-input${adEdited?' tax-edited':''}" id="cr_tax_ad_${idx}" value="${adVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
       </div>`;
   });
   container.innerHTML = html || '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in Ad Name fields above to see the generated Ad taxonomy…</div>';
@@ -1134,6 +1150,47 @@ function taxCampParts(mcode, casenum, projcode, adv, name, geo, goal) {
 /* Mark an input as manually edited so it won't be overwritten */
 function markTaxEdited(el) { el.classList.add('tax-edited'); }
 
+/* Cascade campaign name edits down to ad set and ad taxonomy inputs */
+function propagateCampEdit(campInput) {
+  const m = campInput.id.match(/^(\w+)_tax_camp_(\d+)$/);
+  if (!m) return;
+  const [, pfx, idx] = m;
+  const newCamp = campInput.value;
+  /* Update ad set: keep last 2 segments (targeting, creative) */
+  const asEl = document.getElementById(pfx + '_tax_adset_' + idx);
+  if (asEl) {
+    const parts = asEl.value.split('#');
+    if (parts.length >= 3) {
+      asEl.value = newCamp + '#' + parts.slice(-2).join('#');
+    }
+    asEl.classList.add('tax-edited');
+  }
+  /* Update ad: keep last 6 segments (targeting, creative, adname, var, size, copy) */
+  const adEl = document.getElementById(pfx + '_tax_ad_' + idx);
+  if (adEl) {
+    const parts = adEl.value.split('#');
+    if (parts.length >= 7) {
+      adEl.value = newCamp + '#' + parts.slice(-6).join('#');
+    }
+    adEl.classList.add('tax-edited');
+  }
+}
+
+/* Cascade ad set edits down to ad taxonomy input */
+function propagateAdSetEdit(asInput) {
+  const m = asInput.id.match(/^(\w+)_tax_adset_(\d+)$/);
+  if (!m) return;
+  const [, pfx, idx] = m;
+  const adEl = document.getElementById(pfx + '_tax_ad_' + idx);
+  if (adEl) {
+    const parts = adEl.value.split('#');
+    if (parts.length >= 5) {
+      adEl.value = asInput.value + '#' + parts.slice(-4).join('#');
+    }
+    adEl.classList.add('tax-edited');
+  }
+}
+
 function updateTaxPreview() {
   const container = document.getElementById('taxPreviewContent');
   if (!container) return;
@@ -1161,17 +1218,18 @@ function updateTaxPreview() {
     const targeting = inps[3]?.value?.trim() || '';
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
     const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
-    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
     /* Preserve manual edits — check existing inputs */
     const existCamp  = container.querySelector('#sf_tax_camp_'+idx);
     const existAdSet = container.querySelector('#sf_tax_adset_'+idx);
     const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))  ? existCamp.value : campStr;
+    /* Ad set uses effective campaign value so edits cascade */
+    const adSetStr = campVal + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
     const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="sf_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="sf_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="sf_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateCampEdit(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="sf_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateAdSetEdit(this)" /></div>
       </div>`;
   });
   container.innerHTML = html;
@@ -1434,16 +1492,17 @@ function updateIOTaxPreview() {
     const targeting = inps[3]?.value?.trim() || '';
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
     const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
-    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
     const existCamp  = container.querySelector('#io_tax_camp_'+idx);
     const existAdSet = container.querySelector('#io_tax_adset_'+idx);
     const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))  ? existCamp.value : campStr;
+    /* Ad set uses effective campaign value so edits cascade */
+    const adSetStr = campVal + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
     const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="io_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="io_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="io_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateCampEdit(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="io_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateAdSetEdit(this)" /></div>
       </div>`;
   });
   container.innerHTML = html;
@@ -1706,16 +1765,17 @@ function updateEditIOTaxPreview() {
     const targeting = inps[3]?.value?.trim() || '';
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
     const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
-    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
     const existCamp  = container.querySelector('#eio_tax_camp_'+idx);
     const existAdSet = container.querySelector('#eio_tax_adset_'+idx);
     const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))  ? existCamp.value : campStr;
+    /* Ad set uses effective campaign value so edits cascade */
+    const adSetStr = campVal + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
     const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="eio_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="eio_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="eio_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateCampEdit(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="eio_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this);propagateAdSetEdit(this)" /></div>
       </div>`;
   });
   container.innerHTML = html;
