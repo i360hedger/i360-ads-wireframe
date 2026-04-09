@@ -233,6 +233,9 @@
   .tax-string { font-family:'SF Mono',Menlo,Consolas,monospace; font-size:12px; color:var(--text-primary); background:var(--bg-surface); padding:6px 10px; border-radius:5px; border:1px solid var(--border-subtle); word-break:break-all; line-height:1.5; }
   .tax-string .tax-sep { color:var(--i360-blue); font-weight:700; }
   .tax-string .tax-empty { color:var(--i360-red); font-style:italic; opacity:0.6; }
+  input.tax-input { font-family:'SF Mono',Menlo,Consolas,monospace; font-size:12px; color:var(--text-primary); background:var(--bg-surface); padding:6px 10px; border-radius:5px; border:1px solid var(--border-subtle); width:100%; box-sizing:border-box; line-height:1.5; outline:none; transition:border-color 0.15s; }
+  input.tax-input:focus { border-color:var(--i360-blue); }
+  input.tax-input.tax-edited { border-color:var(--i360-gold); background:rgba(240,179,35,0.05); }
 
   /* ─── Wizard Steps ─── */
   .wizard-steps { display:flex; gap:4px; margin-bottom:24px; }
@@ -1041,10 +1044,6 @@ function updateCreativeTaxPreview() {
   if (!creativeBody) return;
   const creativeRows = Array.from(creativeBody.rows);
 
-  const sep = '<span class="tax-sep">#</span>';
-  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
-  const v = (val, label) => val ? val : empty(label);
-
   let html = '';
   creativeRows.forEach((row, idx) => {
     const s1 = step1Lines[idx] || {};
@@ -1060,18 +1059,21 @@ function updateCreativeTaxPreview() {
     const targeting = s1.targeting || '';
 
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
-    const campParts = [v(mcode,'M-Code')];
-    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
-    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
-    const campStr = campParts.join(sep);
-    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
-    const adStr = adSetStr + sep + v(adName,'Ad Name') + sep + v(variation,'Var') + sep + v(size,'Size/Length') + sep + v(copy,'Copy');
+    const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
+    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
+    const adStr    = adSetStr + '#' + (adName||'[Ad Name]') + '#' + (variation||'[Var]') + '#' + (size||'[Size/Length]') + '#' + (copy||'[Copy]');
+    const existCamp  = container.querySelector('#cr_tax_camp_'+idx);
+    const existAdSet = container.querySelector('#cr_tax_adset_'+idx);
+    const existAd    = container.querySelector('#cr_tax_ad_'+idx);
+    const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))   ? existCamp.value  : campStr;
+    const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
+    const adVal    = (existAd && existAd.classList.contains('tax-edited'))       ? existAd.value    : adStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
-        <div class="tax-level"><div class="tax-level-label">Ad</div><div class="tax-string">${adStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="cr_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="cr_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad</div><input class="tax-input${adVal!==adStr?' tax-edited':''}" id="cr_tax_ad_${idx}" value="${adVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
       </div>`;
   });
   container.innerHTML = html || '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in Ad Name fields above to see the generated Ad taxonomy…</div>';
@@ -1121,6 +1123,17 @@ function removeLineRow(btn) {
 }
 
 /* ── Taxonomy live preview builder ── */
+/* ── Shared: build plain-text taxonomy string ── */
+function taxPlain(parts) { return parts.map(p => p || '').join('#'); }
+function taxCampParts(mcode, casenum, projcode, adv, name, geo, goal) {
+  const p = [mcode || '[M-Code]'];
+  if (casenum || projcode) { p.push(casenum || ''); p.push(projcode || ''); }
+  p.push(adv || '[Advertiser]', name || '[Name]', geo || '[Geo]', goal || '[Goal]');
+  return p;
+}
+/* Mark an input as manually edited so it won't be overwritten */
+function markTaxEdited(el) { el.classList.add('tax-edited'); }
+
 function updateTaxPreview() {
   const container = document.getElementById('taxPreviewContent');
   if (!container) return;
@@ -1136,13 +1149,9 @@ function updateTaxPreview() {
     container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div>';
     return;
   }
-  const sep = '<span class="tax-sep">#</span>';
-  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
-  const v = (val, label) => val ? val : empty(label);
 
   let html = '';
   rows.forEach((row, idx) => {
-    const c = row.cells;
     const sels = row.querySelectorAll('select');
     const inps = row.querySelectorAll('input');
     const platform  = sels[0]?.value || '';
@@ -1151,17 +1160,18 @@ function updateTaxPreview() {
     const goal      = sels[2]?.value || '';
     const targeting = inps[3]?.value?.trim() || '';
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
-    /* Build campaign string — conditionally include Case Number + Project Code after M-Code */
-    const campParts = [v(mcode,'M-Code')];
-    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
-    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
-    const campStr = campParts.join(sep);
-    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
+    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
+    /* Preserve manual edits — check existing inputs */
+    const existCamp  = container.querySelector('#sf_tax_camp_'+idx);
+    const existAdSet = container.querySelector('#sf_tax_adset_'+idx);
+    const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))  ? existCamp.value : campStr;
+    const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="sf_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="sf_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
       </div>`;
   });
   container.innerHTML = html;
@@ -1413,9 +1423,6 @@ function updateIOTaxPreview() {
     container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div>';
     return;
   }
-  const sep = '<span class="tax-sep">#</span>';
-  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
-  const v = (val, label) => val ? val : empty(label);
   let html = '';
   rows.forEach((row, idx) => {
     const sels = row.querySelectorAll('select');
@@ -1426,16 +1433,17 @@ function updateIOTaxPreview() {
     const goal      = sels[2]?.value || '';
     const targeting = inps[3]?.value?.trim() || '';
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
-    const campParts = [v(mcode,'M-Code')];
-    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
-    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
-    const campStr = campParts.join(sep);
-    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
+    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
+    const existCamp  = container.querySelector('#io_tax_camp_'+idx);
+    const existAdSet = container.querySelector('#io_tax_adset_'+idx);
+    const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))  ? existCamp.value : campStr;
+    const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="io_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="io_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
       </div>`;
   });
   container.innerHTML = html;
@@ -1687,9 +1695,6 @@ function updateEditIOTaxPreview() {
     container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">Fill in the fields above to see the generated taxonomy…</div>';
     return;
   }
-  const sep = '<span class="tax-sep">#</span>';
-  const empty = (label) => `<span class="tax-empty">[${label}]</span>`;
-  const v = (val, label) => val ? val : empty(label);
   let html = '';
   rows.forEach((row, idx) => {
     const sels = row.querySelectorAll('select');
@@ -1700,16 +1705,17 @@ function updateEditIOTaxPreview() {
     const goal      = sels[2]?.value || '';
     const targeting = inps[3]?.value?.trim() || '';
     const lineLabel = platform ? `Line ${idx+1} (${platform})` : `Line ${idx+1}`;
-    const campParts = [v(mcode,'M-Code')];
-    if (casenum || projcode) { campParts.push(casenum || ''); campParts.push(projcode || ''); }
-    campParts.push(v(adv,'Advertiser'), v(name,'Name'), v(geo,'Geo'), v(goal,'Goal'));
-    const campStr = campParts.join(sep);
-    const adSetStr = campStr + sep + v(targeting,'Targeting') + sep + v(creative,'Creative');
+    const campStr  = taxPlain(taxCampParts(mcode, casenum, projcode, adv, name, geo, goal));
+    const adSetStr = campStr + '#' + (targeting||'[Targeting]') + '#' + (creative||'[Creative]');
+    const existCamp  = container.querySelector('#eio_tax_camp_'+idx);
+    const existAdSet = container.querySelector('#eio_tax_adset_'+idx);
+    const campVal  = (existCamp && existCamp.classList.contains('tax-edited'))  ? existCamp.value : campStr;
+    const adSetVal = (existAdSet && existAdSet.classList.contains('tax-edited')) ? existAdSet.value : adSetStr;
     html += `
       <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)">
         <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">${lineLabel}</div>
-        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><div class="tax-string">${campStr}</div></div>
-        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><div class="tax-string">${adSetStr}</div></div>
+        <div class="tax-level"><div class="tax-level-label">Campaign Name</div><input class="tax-input${campVal!==campStr?' tax-edited':''}" id="eio_tax_camp_${idx}" value="${campVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
+        <div class="tax-level"><div class="tax-level-label">Ad Set / Ad Group</div><input class="tax-input${adSetVal!==adSetStr?' tax-edited':''}" id="eio_tax_adset_${idx}" value="${adSetVal.replace(/"/g,'&quot;')}" oninput="markTaxEdited(this)" /></div>
       </div>`;
   });
   container.innerHTML = html;
